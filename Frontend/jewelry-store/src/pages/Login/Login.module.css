@@ -1,0 +1,236 @@
+.pageWrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background: #e0e2e4;
+    background-image: url("https://images.unsplash.com/photo-1522202176988-66273c2fd55f");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    position: relative;
+}
+
+/* lớp phủ mờ */
+.pageWrapper::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.4);
+    z-index: 0;
+}
+
+.loginContainer {
+    display: flex;
+    flex-direction: column;
+    width: 60%;
+    max-width: 900px;
+    background: rgba(255, 255, 255, 0.92);
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    font-family: "Segoe UI", sans-serif;
+    position: relative;
+    z-index: 1;
+    padding: 40px 50px;
+    transition: all 0.3s ease;
+}
+
+.loginRight {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+}
+
+.closeBtn {
+    position: absolute;
+    top: 15px;
+    right: 20px;
+    font-size: 28px;
+    cursor: pointer;
+    color: #666;
+    transition: 0.3s;
+}
+
+.closeBtn:hover {
+    color: #000;
+}
+
+.tab {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    margin-bottom: 30px;
+    border-bottom: 1px solid #ddd;
+    padding-bottom: 10px;
+}
+
+.tabBtn {
+    background: none;
+    border: none;
+    font-weight: 600;
+    font-size: 26px;
+    color: #999;
+    cursor: pointer;
+    border-bottom: 3px solid transparent;
+    transition: 0.3s;
+    padding: 5px 15px;
+}
+
+.tabBtn:hover {
+    color: #333;
+}
+
+.active {
+    color: #000;
+    border-bottom: 3px solid #b38bff;
+}
+
+.form {
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+}
+
+.form label {
+    font-size: 20px;
+    color: #815fc0;
+}
+
+.form input {
+    padding: 12px;
+    border: none;
+    border-bottom: 2px solid #d1c4e9;
+    background: transparent;
+    outline: none;
+    font-size: 18px;
+    transition: 0.3s;
+    font-style: italic;
+}
+
+.form input:focus {
+    border-color: #b38bff;
+}
+
+/* --- phần SIGNUP --- */
+.formSignup {
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+}
+
+.formRow {
+    display: flex;
+    gap: 25px;
+    flex-wrap: wrap;
+}
+
+.formGroup {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.formGroup label {
+    font-size: 20px;
+    margin-bottom: 5px;
+    color: #815fc0;
+}
+
+.formGroup input {
+    padding: 10px;
+    border: none;
+    border-bottom: 2px solid #d1c4e9;
+    background: transparent;
+    outline: none;
+    font-size: 18px;
+    transition: 0.3s;
+}
+
+.formGroup input:focus {
+    border-color: #b38bff;
+}
+
+.formGroupSingle {
+    display: flex;
+    flex-direction: column;
+}
+
+/* --- button --- */
+.btnSignIn {
+    margin-top: 40px;
+    padding: 14px 40px;
+    background: #333;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 22px;
+    transition: 0.3s;
+    align-self: center;
+}
+
+.btnSignIn:hover {
+    background: #555;
+}
+
+.forgot {
+    margin-top: 10px;
+    text-align: right;
+}
+
+.forgot a {
+    color: #888;
+    text-decoration: none;
+}
+
+.forgot a:hover {
+    text-decoration: underline;
+}
+
+/* --- responsive --- */
+@media (max-width: 1024px) {
+    .loginContainer {
+        width: 75%;
+        padding: 30px 40px;
+    }
+
+    .tabBtn {
+        font-size: 22px;
+    }
+
+    .form input,
+    .formGroup input {
+        font-size: 16px;
+    }
+
+    .btnSignIn {
+        font-size: 18px;
+        padding: 12px 30px;
+    }
+}
+
+@media (max-width: 768px) {
+    .loginContainer {
+        width: 90%;
+        padding: 25px;
+    }
+
+    .formRow {
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .tab {
+        gap: 15px;
+    }
+
+    .tabBtn {
+        font-size: 18px;
+    }
+
+    .btnSignIn {
+        width: 100%;
+    }
+}

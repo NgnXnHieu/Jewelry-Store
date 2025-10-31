@@ -1,0 +1,132 @@
+.checkoutContainer {
+    width: 90%;
+    margin: 40px auto;
+    font-family: "Segoe UI", sans-serif;
+}
+
+h1 {
+    text-align: center;
+    margin-bottom: 30px;
+    padding: 10px;
+    font-family: "Segoe UI", sans-serif;
+}
+
+.checkoutGrid {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 40px;
+}
+
+.infoSection {
+    background: #fff;
+    padding: 25px;
+    border-radius: 12px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.infoSection label {
+    display: block;
+    margin-bottom: 15px;
+    font-weight: 500;
+}
+
+.infoSection input,
+.infoSection textarea {
+    width: 100%;
+    padding: 10px;
+    margin-top: 5px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+}
+
+.infoSection textarea {
+    resize: none;
+    height: 80px;
+}
+
+.paymentMethods {
+    margin: 15px 0;
+}
+
+.paymentMethods label {
+    display: block;
+    margin-bottom: 8px;
+}
+
+.confirmButton {
+    background-color: #28a745;
+    color: white;
+    border: none;
+    padding: 12px 25px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 16px;
+    width: 100%;
+    margin-top: 15px;
+}
+
+.confirmButton:hover {
+    background-color: #218838;
+}
+
+/* --- Đơn hàng --- */
+.summarySection {
+    background: #fdfdfd;
+    padding: 25px;
+    border-radius: 12px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.orderList {
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.orderItem {
+    display: flex;
+    align-items: center;
+    border-bottom: 1px solid #eee;
+    padding: 10px 0;
+}
+
+.orderItem img {
+    width: 70px;
+    height: 70px;
+    border-radius: 10px;
+    object-fit: cover;
+    margin-right: 10px;
+}
+
+.name {
+    font-weight: 600;
+}
+
+.subtotal {
+    color: #1677ff;
+    font-weight: bold;
+}
+
+.totalBox {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+    font-size: 18px;
+    padding-top: 10px;
+    border-top: 2px solid #ddd;
+}
+
+
+.changeButton {
+    background-color: #1677ff;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.2s ease;
+}
+
+.changeButton:hover {
+    background-color: #1056c4;
+}

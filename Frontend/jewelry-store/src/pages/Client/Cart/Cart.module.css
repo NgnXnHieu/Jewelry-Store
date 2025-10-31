@@ -1,0 +1,131 @@
+.container {
+    background-color: #fdf6f6;
+    border-radius: 10px;
+    padding: 20px 40px;
+    box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
+    width: 90%;
+    margin: 30px auto;
+    font-family: "Segoe UI", sans-serif;
+}
+
+.container h1 {
+    text-align: center;
+    color: #3b2066;
+    margin-bottom: 20px;
+}
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: #fff6f6;
+}
+
+.table th,
+.table td {
+    border: 1px solid #c7b8c7;
+    text-align: center;
+    padding: 10px;
+    color: #3b2066;
+}
+
+.table th {
+    background-color: #f8edf8;
+    font-weight: 600;
+}
+
+.image {
+    width: 100px;
+    height: 80px;
+    border-radius: 8px;
+}
+
+.quantityBox {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+}
+
+.quantityBox button {
+    border: none;
+    background-color: #e5e3e8;
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 16px;
+    color: #3b2066;
+    transition: background 0.2s;
+}
+
+.quantityBox button:hover {
+    background-color: #d6cce3;
+}
+
+.quantityBox span {
+    background-color: #fff;
+    padding: 4px 10px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    font-weight: 500;
+}
+
+.delete {
+    color: red;
+    cursor: pointer;
+    text-decoration: underline;
+}
+
+.delete:hover {
+    color: #b30000;
+}
+
+.deleteButton {
+    background-color: #ffeded;
+    color: #d93025;
+    border: none;
+    border-radius: 8px;
+    padding: 8px 16px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.deleteButton:hover {
+    background-color: #ffc9c9;
+}
+
+.buyButton {
+    background-color: #ff8b3d;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 8px 16px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.buyButton:hover {
+    background-color: #e46e1b;
+}
+
+.buySelectedButton {
+    padding: 10px 25px;
+    border: none;
+    border-radius: 8px;
+    background-color: #ccc;
+    color: white;
+    font-size: 16px;
+    cursor: not-allowed;
+    transition: all 0.3s ease;
+    margin-top: 10px;
+
+}
+
+.buySelectedButton.active {
+    background-color: #c81d1a;
+    cursor: pointer;
+}
