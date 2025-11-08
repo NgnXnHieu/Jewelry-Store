@@ -10,12 +10,14 @@ public class UserDTO {
     private String full_name;
     private String phone;
     private LocalDateTime created_at;
+    private String image_url;
+    private Boolean is_active;
 
     public UserDTO() {
     }
 
     public UserDTO(Integer id, String username, String email, String role, String fullName, String phone,
-            LocalDateTime createdAt) {
+            LocalDateTime createdAt, Boolean is_active, String image_url) {
         this.id = id;
         this.username = username;
         this.email = email;
@@ -23,6 +25,8 @@ public class UserDTO {
         this.full_name = fullName;
         this.phone = phone;
         this.created_at = createdAt;
+        this.is_active = is_active;
+        this.image_url = image_url;
     }
 
     public Integer getId() {
@@ -79,5 +83,21 @@ public class UserDTO {
 
     public void setCreated_at(LocalDateTime createdAt) {
         this.created_at = createdAt;
+    }
+
+    public Boolean isIs_active() {
+        return is_active;
+    }
+
+    public void setIs_active(Boolean is_active) {
+        this.is_active = is_active;
+    }
+
+    public String getImage_url() {
+        return image_url;
+    }
+
+    public void setImage_url(String image_url) {
+        this.image_url = image_url;
     }
 }

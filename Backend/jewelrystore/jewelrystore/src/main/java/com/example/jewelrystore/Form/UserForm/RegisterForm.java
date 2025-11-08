@@ -24,6 +24,8 @@ public class RegisterForm {
 
     private String role; // ví dụ: "USER" hoặc "ADMIN"
 
+    private Boolean is_active;
+
     public RegisterForm() {
     }
 
@@ -34,6 +36,7 @@ public class RegisterForm {
         this.full_name = fullName;
         this.phone = phone;
         this.role = role;
+        this.is_active = true;
     }
 
     // Getters & Setters
@@ -83,6 +86,14 @@ public class RegisterForm {
 
     public void setRole(String role) {
         this.role = role;
+    }
+
+    public Boolean isIs_active() {
+        return is_active;
+    }
+
+    public void setIs_active(Boolean is_active) {
+        this.is_active = is_active;
     }
 
 }

@@ -15,12 +15,16 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.example.jewelrystore.DTO.LoginDTO;
 import com.example.jewelrystore.DTO.UserDTO;
 import com.example.jewelrystore.Form.UserForm.LoginForm;
 import com.example.jewelrystore.Form.UserForm.RegisterForm;
+import com.example.jewelrystore.Form.UserForm.UserCreateForm;
 import com.example.jewelrystore.Form.UserForm.UserUpdateForm;
 import com.example.jewelrystore.Service.AuthService;
 import com.example.jewelrystore.Service.UserService;
@@ -43,10 +47,26 @@ public class UserController {
         return userService.getAllUser(pageable);
     }
 
+    @GetMapping("/humanResources")
+    public Page<UserDTO> getAllHumanResources(Pageable pageable) {
+        return userService.getAllHumanresources(pageable);
+    }
+
+    // Admin tạo tài khoản cho nhân viên
     @PostMapping
-    public ResponseEntity create(@RequestBody @Valid RegisterForm userCreateForm) {
-        UserDTO created = userService.create(userCreateForm);
-        return ResponseEntity.status(HttpStatus.CREATED).body(created);
+    public ResponseEntity create(@RequestParam("username") String username,
+            @RequestParam("email") String email,
+            @RequestParam("password") String password,
+            @RequestParam("role") String role,
+            @RequestParam("full_name") String full_name,
+            @RequestParam("phone") String phone,
+            @RequestParam(value = "image_url", required = false) String imageUrl,
+            @RequestParam("is_active") Boolean is_active,
+            @RequestPart(value = "image", required = false) MultipartFile image) {
+        UserCreateForm userCreateForm = new UserCreateForm(username, email, password, full_name, phone, role, is_active,
+                imageUrl);
+        UserDTO created = userService.create(userCreateForm, image);
+        return ResponseEntity.status(HttpStatus.CREATED).body(created != null ? created : "Tài khoản đã tồn tại");
     }
 
     @GetMapping("/{id}")
@@ -54,10 +74,21 @@ public class UserController {
         return userService.getUserById(id);
     }
 
+    // Admin Update thông tin nhân viên
     @PutMapping("/{id}")
-    public ResponseEntity update(@PathVariable Integer id, @RequestBody UserUpdateForm userUpdateForm) {
-        UserDTO updated = userService.updateUser(id, userUpdateForm);
-        return (updated != null) ? ResponseEntity.ok(updated) : ResponseEntity.notFound().build();
+    public ResponseEntity update(
+            @PathVariable @Valid Integer id,
+            @RequestParam(value = "email", required = false) String email,
+            @RequestParam(value = "role", required = false) String role,
+            @RequestParam(value = "full_name", required = false) String full_name,
+            @RequestParam(value = "phone", required = false) String phone,
+            @RequestParam(value = "image_url", required = false) String imageUrl,
+            @RequestParam(value = "is_active", required = false) Boolean is_active,
+            @RequestPart(value = "image", required = false) MultipartFile image) {
+        UserUpdateForm userUpdateForm = new UserUpdateForm(email, full_name, phone, role, is_active, imageUrl);
+        UserDTO updated = userService.updateUser(id, userUpdateForm, image);
+        return (updated != null) ? ResponseEntity.ok(updated != null ? updated : "Tài khoản không tồn tại")
+                : ResponseEntity.notFound().build();
     }
 
     @DeleteMapping("/{id}")
@@ -74,20 +105,5 @@ public class UserController {
         return userService.getInfor(userDetails.getUsername());
 
     }
-
-    // @GetMapping("/api/infor")
-    // public String getCurrentUser() {
-    // return "haha";
-
-    // }
-
-    // @GetMapping("/api/infor")
-    // public UserDTO getCurrentUser(Authentication authentication) {
-    // System.out.println(authentication);
-    // if (authentication == null)
-    // return null;
-    // UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-    // return userService.getInfor(userDetails.getUsername());
-    // }
 
 }

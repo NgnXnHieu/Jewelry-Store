@@ -1,5 +1,7 @@
 package com.example.jewelrystore.Controller;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -32,6 +34,12 @@ public class CategoryController {
     @GetMapping
     public Page<CategoryDTO> getAll(Pageable pageable) {
         return service.getAllCategory(pageable);
+    }
+
+    // Lấy tất cả mà không phân trang
+    @GetMapping("/all")
+    public List<CategoryDTO> getAllNoPage() {
+        return service.getAllNoPage();
     }
 
     @GetMapping("/{id}")

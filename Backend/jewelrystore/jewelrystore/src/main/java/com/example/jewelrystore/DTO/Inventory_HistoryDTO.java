@@ -2,64 +2,29 @@ package com.example.jewelrystore.DTO;
 
 import java.time.LocalDateTime;
 
+import com.example.jewelrystore.Entity.Product;
+import com.example.jewelrystore.Entity.User;
+
+import io.micrometer.common.lang.NonNull;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+@Setter
+@Getter
+@NoArgsConstructor
+@AllArgsConstructor
 public class Inventory_HistoryDTO {
     private Integer id;
     private LocalDateTime date;
-    private Long quantity;
-    private Integer productId; // lấy từ Product
-    private Integer userId; // lấy từ User
-
-    public Inventory_HistoryDTO() {
-    }
-
-    public Inventory_HistoryDTO(Integer id, LocalDateTime date, Long quantity, Integer productId, Integer userId) {
-        this.id = id;
-        this.date = date;
-        this.quantity = quantity;
-        this.productId = productId;
-        this.userId = userId;
-    }
-
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
-    public LocalDateTime getDate() {
-        return date;
-    }
-
-    public void setDate(LocalDateTime date) {
-        this.date = date;
-    }
-
-    public Long getQuantity() {
-        return quantity;
-    }
-
-    public void setQuantity(Long quantity) {
-        this.quantity = quantity;
-    }
-
-    public Integer getProductId() {
-        return productId;
-    }
-
-    public void setProductId(Integer productId) {
-        this.productId = productId;
-    }
-
-    public Integer getUserId() {
-        return userId;
-    }
-
-    public void setUserId(Integer userId) {
-        this.userId = userId;
-    }
-
-    
-
+    // private Integer productId; // lấy từ Product
+    // private Integer userId; // lấy từ User
+    private Long importQuantity;
+    private Long currentQuantity;
+    private Integer userId;
+    private String userFullName;
+    private Integer productId;
+    private String image_url;
+    private String productName;
 }

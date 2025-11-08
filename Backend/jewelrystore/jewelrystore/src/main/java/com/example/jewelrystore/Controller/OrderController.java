@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.jewelrystore.DTO.OrderDTO;
+import com.example.jewelrystore.DTO.OrderSumaryDTO;
 import com.example.jewelrystore.Entity.Order;
 import com.example.jewelrystore.Form.OrderForm.OrderCreateForm;
 import com.example.jewelrystore.Form.OrderForm.OrderUpdateForm;
@@ -38,6 +39,11 @@ public class OrderController {
     @GetMapping
     public Page<OrderDTO> getAll(Pageable pageable) {
         return service.getAllOrder(pageable);
+    }
+
+    @GetMapping("/orderSumaries")
+    public Page<OrderSumaryDTO> getOrderSumarys(Pageable pageable) {
+        return service.getAllOrderSumary(pageable);
     }
 
     @GetMapping("/{id}")
@@ -86,5 +92,20 @@ public class OrderController {
             return null;
         return service.getMyOrderByStatus(userDetails.getUsername(), status);
     }
+
+    // @GetMapping("revenuePerYear")
+    // public String getMethodName(@RequestParam String param) {
+    // return new String();
+    // }
+
+    // @GetMapping("revenuePerMonth")
+    // public String getMethodName(@RequestParam String param) {
+    // return new String();
+    // }
+
+    // @GetMapping("revenuePerDay")
+    // public String getMethodName(@RequestParam String param) {
+    // return new String();
+    // }
 
 }

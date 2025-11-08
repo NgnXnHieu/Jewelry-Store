@@ -42,10 +42,10 @@ export default function Login() {
             alert("Login successful!");
 
             // Nếu backend trả role trong response, dùng để chuyển hướng
-            if (res.data.role === "ADMIN") {
-                navigate("/productdetail");
+            if (res.data.role === "ROLE_ADMIN") {
+                navigate("/admin");
             } else {
-                navigate("/");
+                navigate("/"); // tạm thời chuyển về admin trang chính
             }
 
         } catch (err) {

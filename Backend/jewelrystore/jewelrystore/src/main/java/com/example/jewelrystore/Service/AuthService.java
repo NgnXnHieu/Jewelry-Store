@@ -13,7 +13,7 @@ import jakarta.servlet.http.HttpServletResponse;
 public interface AuthService {
     // LoginDTO login(LoginForm request);
 
-    void login(LoginForm request, HttpServletResponse response);
+    ResponseEntity<?> login(LoginForm request, HttpServletResponse response);
 
     // LoginDTO refreshToken(Map<String, String> request);
 

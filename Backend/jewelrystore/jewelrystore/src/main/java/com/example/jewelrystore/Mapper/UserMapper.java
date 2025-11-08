@@ -8,12 +8,15 @@ import org.mapstruct.NullValuePropertyMappingStrategy;
 import com.example.jewelrystore.DTO.UserDTO;
 import com.example.jewelrystore.Entity.User;
 import com.example.jewelrystore.Form.UserForm.RegisterForm;
+import com.example.jewelrystore.Form.UserForm.UserCreateForm;
 import com.example.jewelrystore.Form.UserForm.UserUpdateForm;
 
 @Mapper(componentModel = "spring")
 
 public abstract class UserMapper {
     public abstract User toEntity(RegisterForm userCreateForm);
+
+    public abstract User toStaffEntity(UserCreateForm createForm);
 
     public abstract UserDTO toUserDTO(User user);
 

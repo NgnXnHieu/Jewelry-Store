@@ -12,9 +12,17 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Table(name = "inventory_history")
+@Setter
+@Getter
+@NoArgsConstructor
+@AllArgsConstructor
 public class Inventory_History {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -22,7 +30,9 @@ public class Inventory_History {
     @CreationTimestamp
     private LocalDateTime date;
     @NonNull
-    private Long quantity;
+    private Long importQuantity;
+    @NonNull
+    private Long currentQuantity;
     @ManyToOne
     @JoinColumn(name = "product_id")
     private Product product;
@@ -30,62 +40,10 @@ public class Inventory_History {
     @JoinColumn(name = "user_id")
     private User user;
 
-    public Inventory_History() {
-    }
-
-    public Inventory_History(Integer id, LocalDateTime date, Long quantity, Product product, User user) {
-        this.id = id;
-        this.date = date;
-        this.quantity = quantity;
-        this.product = product;
-        this.user = user;
-    }
-
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
-    public LocalDateTime getDate() {
-        return date;
-    }
-
-    public void setDate(LocalDateTime date) {
-        this.date = date;
-    }
-
-    public Long getQuantity() {
-        return quantity;
-    }
-
-    public void setQuantity(Long quantity) {
-        this.quantity = quantity;
-    }
-
-    public Product getProduct() {
-        return product;
-    }
-
-    public void setProduct(Product product) {
-        this.product = product;
-    }
-
-    public User getUser() {
-        return user;
-    }
-
-    public void setUser(User user) {
-        this.user = user;
-    }
-
     @Override
     public String toString() {
-        return "Inventory_History [id=" + id + ", date=" + date + ", quantity=" + quantity + ", product=" + product
-                + ", user=" + user + "]";
+        return "Inventory_History [id=" + id + ", date=" + date + ", importQuantity=" + importQuantity
+                + ", currentQuantity=" + currentQuantity + ", product=" + product + ", user=" + user + "]";
     }
 
-    
 }

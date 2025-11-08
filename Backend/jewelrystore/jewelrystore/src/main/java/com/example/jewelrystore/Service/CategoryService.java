@@ -1,5 +1,7 @@
 package com.example.jewelrystore.Service;
 
+import java.util.List;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -13,6 +15,8 @@ public interface CategoryService {
     CategoryDTO updateCategory(Integer id, CategoryUpdateForm Form);
 
     Page<CategoryDTO> getAllCategory(Pageable pageable);
+
+    List<CategoryDTO> getAllNoPage();
 
     CategoryDTO getCategoryById(Integer id);
 

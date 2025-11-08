@@ -11,7 +11,6 @@ const Cart = () => {
     const [loading, setLoading] = useState(true);
     const navigate = useNavigate();
 
-
     // Gọi API cập nhật số lượng (debounced)
     const updateQuantity = debounce(async (id, quantity) => {
         try {
@@ -22,20 +21,15 @@ const Cart = () => {
         }
     }, 1000);
 
-
-    // const userId = 21; // tạm thời gắn cứng, có thể lấy từ context hoặc token sau này
     const API_URL = `http://localhost:8080/api/cart_details/cart_detailsByUserName`;
 
     useEffect(() => {
         const fetchCart = async () => {
             try {
                 const res = await axiosInstance.get("/cart_details/cart_detailsByUserName");
-                // const res = await axios.get(API_URL);
                 console.log("Dữ liệu giỏ hàng:", res.data);
 
-                // Nếu backend trả về kiểu Page (có field content)
                 if (res.data && res.data.content) {
-                    // Chuyển đổi để phù hợp với cấu trúc đang dùng
                     const mappedItems = res.data.content.map((item) => ({
                         id: item.id,
                         productId: item.productId,
@@ -46,7 +40,6 @@ const Cart = () => {
                         selected: false,
                     }));
                     setCartItems(mappedItems.reverse());
-
                 } else {
                     setCartItems([]);
                 }
@@ -69,9 +62,8 @@ const Cart = () => {
         );
     };
 
-    //Xử lý mua 1 sản phẩm
+    // Xử lý mua 1 sản phẩm
     const handleBuyOne = (item) => {
-        // Chuyển hướng sang trang checkout, kèm dữ liệu sản phẩm
         navigate("/checkout", {
             state: {
                 items: [
@@ -85,20 +77,18 @@ const Cart = () => {
         });
     };
 
-
     // Chọn tất cả sản phẩm
     const selectAll = (checked) => {
         setCartItems((prev) => prev.map((item) => ({ ...item, selected: checked })));
     };
 
-
-    //Tăng giảm số lượng
+    // Tăng giảm số lượng
     const increase = (id) => {
         setCartItems((prev) =>
             prev.map((item) => {
                 if (item.id === id) {
                     const newQuantity = item.quantity + 1;
-                    updateQuantity(id, newQuantity); // ✅ gọi hàm debounce
+                    updateQuantity(id, newQuantity);
                     return { ...item, quantity: newQuantity };
                 }
                 return item;
@@ -111,18 +101,13 @@ const Cart = () => {
             prev.map((item) => {
                 if (item.id === id && item.quantity > 1) {
                     const newQuantity = item.quantity - 1;
-                    updateQuantity(id, newQuantity); // ✅ gọi hàm debounce
+                    updateQuantity(id, newQuantity);
                     return { ...item, quantity: newQuantity };
                 }
                 return item;
             })
         );
     };
-
-
-    // const removeItem = (id) => {
-    //     setCartItems((prev) => prev.filter((item) => item.id !== id));
-    // };
 
     // Tổng tiền các sản phẩm được chọn
     const total = cartItems
@@ -136,11 +121,15 @@ const Cart = () => {
     const handleBuySelected = () => {
         const selected = cartItems.filter((item) => item.selected);
         if (selected.length === 0) {
-            Swal.fire("Chưa chọn sản phẩm", "Vui lòng chọn ít nhất một sản phẩm để mua.", "warning");
+            Swal.fire({
+                title: "Chưa chọn sản phẩm",
+                text: "Vui lòng chọn ít nhất một sản phẩm để mua.",
+                icon: "warning",
+                confirmButtonColor: "#667eea"
+            });
             return;
         }
 
-        // Điều hướng sang trang checkout, truyền danh sách sản phẩm đã chọn
         navigate("/checkout", {
             state: {
                 items: selected.map((item) => ({
@@ -152,7 +141,7 @@ const Cart = () => {
         });
     };
 
-    //Xử lý xóa
+    // Xử lý xóa
     const removeItem = async (id) => {
         const item = cartItems.find((i) => i.id === id);
         if (!item) return;
@@ -164,32 +153,35 @@ const Cart = () => {
             showCancelButton: true,
             confirmButtonText: "Có, xóa!",
             cancelButtonText: "Hủy",
+            confirmButtonColor: "#ff4757",
+            cancelButtonColor: "#667eea"
         }).then(async (result) => {
             if (result.isConfirmed) {
                 try {
                     await axiosInstance.delete(`/cart_details/${id}`);
                     setCartItems((prev) => prev.filter((i) => i.id !== id));
-                    // Swal.fire("Đã xóa!", "Sản phẩm đã bị xóa khỏi giỏ hàng.", "success");
-
-                    // ✅ Cập nhật giao diện
-                    setCartItems((prev) => prev.filter((i) => i.id !== id));
-
-                    Swal.fire("Đã xóa!", `"${item.name}" đã bị xóa khỏi giỏ hàng.`, "success");
+                    Swal.fire({
+                        title: "Đã xóa!",
+                        text: `"${item.name}" đã bị xóa khỏi giỏ hàng.`,
+                        icon: "success",
+                        confirmButtonColor: "#667eea"
+                    });
                 } catch (error) {
                     console.error("Lỗi khi xóa sản phẩm:", error);
-                    Swal.fire("Lỗi!", "Không thể xóa sản phẩm. Vui lòng thử lại.", "error");
+                    Swal.fire({
+                        title: "Lỗi!",
+                        text: "Không thể xóa sản phẩm. Vui lòng thử lại.",
+                        icon: "error",
+                        confirmButtonColor: "#667eea"
+                    });
                 }
             }
         });
     };
 
-
-
-
     useEffect(() => {
         const handleBeforeUnload = () => {
-            // Chờ tất cả các debounce còn lại chạy xong
-            updateQuantity.flush?.(); // flush để chạy ngay các debounce còn pending
+            updateQuantity.flush?.();
         };
 
         window.addEventListener("beforeunload", handleBeforeUnload);
@@ -200,90 +192,158 @@ const Cart = () => {
         };
     }, []);
 
-    if (loading) return <p>Đang tải giỏ hàng...</p>;
+    if (loading) {
+        return (
+            <div className={styles.container}>
+                <div className={styles.loadingContainer}>
+                    <div className={styles.spinner}></div>
+                    <p className={styles.loadingText}>Đang tải giỏ hàng...</p>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className={styles.container}>
-            <h1>Giỏ hàng của tôi</h1>
+            {/* Header */}
+            <div className={styles.header}>
+                <div className={styles.headerContent}>
+                    <h1 className={styles.title}>🛒 Giỏ hàng của tôi</h1>
+                    <p className={styles.subtitle}>
+                        {cartItems.length > 0
+                            ? `Bạn có ${cartItems.length} sản phẩm trong giỏ hàng`
+                            : "Giỏ hàng của bạn đang trống"
+                        }
+                    </p>
+                </div>
+            </div>
+
             {cartItems.length === 0 ? (
-                <p>Giỏ hàng trống.</p>
+                <div className={styles.emptyCart}>
+                    <div className={styles.emptyIcon}>🛍️</div>
+                    <h2 className={styles.emptyTitle}>Giỏ hàng trống</h2>
+                    <p className={styles.emptyText}>
+                        Hãy thêm sản phẩm vào giỏ hàng để tiếp tục mua sắm
+                    </p>
+                    <button
+                        className={styles.shopNowButton}
+                        onClick={() => navigate("/")}
+                    >
+                        Mua sắm ngay
+                    </button>
+                </div>
             ) : (
                 <>
-                    <table className={styles.table}>
-                        <thead>
-                            <tr>
-                                <th>
+                    {/* Select All Bar */}
+                    <div className={styles.selectAllBar}>
+                        <label className={styles.selectAllLabel}>
+                            <input
+                                type="checkbox"
+                                className={styles.checkbox}
+                                checked={allSelected}
+                                onChange={(e) => selectAll(e.target.checked)}
+                            />
+                            <span>Chọn tất cả ({cartItems.length} sản phẩm)</span>
+                        </label>
+                    </div>
+
+                    {/* Cart Items */}
+                    <div className={styles.cartItems}>
+                        {cartItems.map((item, index) => (
+                            <div
+                                key={item.id}
+                                className={`${styles.cartCard} ${item.selected ? styles.selected : ''}`}
+                            >
+                                <div className={styles.cardCheckbox}>
                                     <input
                                         type="checkbox"
-                                        checked={allSelected}
-                                        onChange={(e) => selectAll(e.target.checked)}
+                                        className={styles.checkbox}
+                                        checked={item.selected}
+                                        onChange={() => toggleSelect(item.id)}
                                     />
-                                </th>
-                                <th>STT</th>
-                                <th>Ảnh</th>
-                                <th>Tên sản phẩm</th>
-                                <th>SL</th>
-                                <th>Đơn giá</th>
-                                <th>Thành tiền</th>
-                                <th colSpan="2">Thao tác</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {cartItems.map((item, index) => (
-                                <tr key={item.id}>
-                                    <td>
-                                        <input
-                                            type="checkbox"
-                                            checked={item.selected}
-                                            onChange={() => toggleSelect(item.id)}
-                                        />
-                                    </td>
-                                    <td>{index + 1}</td>
-                                    <td>
-                                        <img
-                                            src={item.image}
-                                            alt={item.name}
-                                            className={styles.image}
-                                        />
-                                    </td>
-                                    <td>{item.name}</td>
-                                    <td>
-                                        <div className={styles.quantityBox}>
-                                            <button onClick={() => decrease(item.id)}>-</button>
-                                            <span>{item.quantity}</span>
-                                            <button onClick={() => increase(item.id)}>+</button>
-                                        </div>
-                                    </td>
-                                    <td>{item.price.toLocaleString()}đ</td>
-                                    <td>{(item.price * item.quantity).toLocaleString()}đ</td>
-                                    <td>
-                                        <button
-                                            className={styles.deleteButton}
-                                            onClick={() => removeItem(item.id)}
-                                        >
-                                            Xóa
-                                        </button>
-                                    </td>
-                                    <td>
-                                        <button className={styles.buyButton} onClick={() => handleBuyOne(item)}>Mua</button>
-                                    </td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
+                                </div>
 
-                    <div className={styles.bottomBar}>
-                        <div className={styles.total}>
-                            <strong>Tổng cộng: {total.toLocaleString()}đ</strong>
+                                <div className={styles.cardImage}>
+                                    <img src={item.image} alt={item.name} />
+                                    <span className={styles.itemNumber}>{index + 1}</span>
+                                </div>
+
+                                <div className={styles.cardInfo}>
+                                    <h3 className={styles.itemName}>{item.name}</h3>
+                                    <p className={styles.itemPrice}>
+                                        {item.price.toLocaleString()}₫
+                                    </p>
+                                </div>
+
+                                <div className={styles.cardQuantity}>
+                                    <label className={styles.quantityLabel}>Số lượng</label>
+                                    <div className={styles.quantityControl}>
+                                        <button
+                                            className={styles.quantityBtn}
+                                            onClick={() => decrease(item.id)}
+                                            disabled={item.quantity <= 1}
+                                        >
+                                            −
+                                        </button>
+                                        <span className={styles.quantityValue}>{item.quantity}</span>
+                                        <button
+                                            className={styles.quantityBtn}
+                                            onClick={() => increase(item.id)}
+                                        >
+                                            +
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div className={styles.cardTotal}>
+                                    <label className={styles.totalLabel}>Thành tiền</label>
+                                    <p className={styles.totalPrice}>
+                                        {(item.price * item.quantity).toLocaleString()}₫
+                                    </p>
+                                </div>
+
+                                <div className={styles.cardActions}>
+                                    <button
+                                        className={styles.deleteBtn}
+                                        onClick={() => removeItem(item.id)}
+                                        title="Xóa sản phẩm"
+                                    >
+                                        🗑️
+                                    </button>
+                                    <button
+                                        className={styles.buyOneBtn}
+                                        onClick={() => handleBuyOne(item)}
+                                    >
+                                        Mua ngay
+                                    </button>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+
+                    {/* Summary Bar */}
+                    <div className={styles.summaryBar}>
+                        <div className={styles.summaryContent}>
+                            <div className={styles.summaryInfo}>
+                                <div className={styles.summaryRow}>
+                                    <span>Số lượng đã chọn:</span>
+                                    <strong>{cartItems.filter(item => item.selected).length} sản phẩm</strong>
+                                </div>
+                                <div className={styles.summaryRow}>
+                                    <span>Tổng tiền hàng:</span>
+                                    <strong className={styles.totalAmount}>
+                                        {total.toLocaleString()}₫
+                                    </strong>
+                                </div>
+                            </div>
+                            <button
+                                className={`${styles.checkoutBtn} ${total > 0 ? styles.active : ''}`}
+                                disabled={total === 0}
+                                onClick={handleBuySelected}
+                            >
+                                {total > 0 ? '🛍️ Thanh toán' : 'Chọn sản phẩm để thanh toán'}
+                            </button>
                         </div>
-                        <button
-                            className={`${styles.buySelectedButton} ${total > 0 ? styles.active : ""
-                                }`}
-                            disabled={total === 0}
-                            onClick={handleBuySelected}
-                        >
-                            Mua hàng
-                        </button>
                     </div>
                 </>
             )}

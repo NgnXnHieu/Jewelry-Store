@@ -1,5 +1,6 @@
 package com.example.jewelrystore.Implement;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -119,8 +120,11 @@ public class AuthImpl implements AuthService {
 
             response.addCookie(accessCookie);
             response.addCookie(refreshCookie);
-
-            return ResponseEntity.ok("Access token refreshed successfully");
+            // Trả role trong body
+            Map<String, String> body = new HashMap<>();
+            body.put("role", role);
+            return ResponseEntity.ok(body);
+            // return ResponseEntity.ok("Access token refreshed successfully");
 
         } catch (
 
@@ -130,7 +134,7 @@ public class AuthImpl implements AuthService {
     }
 
     @Override
-    public void login(LoginForm request, HttpServletResponse response) {
+    public ResponseEntity<Map<String, String>> login(LoginForm request, HttpServletResponse response) {
         // Xác thực tài khoản, mật khẩu
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword()));
@@ -163,6 +167,10 @@ public class AuthImpl implements AuthService {
         // 🔹 4. Gắn cookies vào response
         response.addCookie(accessCookie);
         response.addCookie(refreshCookie);
+        // Trả role trong body
+        Map<String, String> body = new HashMap<>();
+        body.put("role", role);
+        return ResponseEntity.ok(body);
     }
 
     // 🔴 Đăng xuất — xóa cookies

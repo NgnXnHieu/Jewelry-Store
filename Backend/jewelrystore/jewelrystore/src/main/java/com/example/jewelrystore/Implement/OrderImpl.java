@@ -6,11 +6,14 @@ import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import com.example.jewelrystore.DTO.OrderDTO;
+import com.example.jewelrystore.DTO.OrderSumaryDTO;
 import com.example.jewelrystore.Entity.Order;
 import com.example.jewelrystore.Entity.Order_Detail;
 import com.example.jewelrystore.Entity.Product;
@@ -123,6 +126,15 @@ public class OrderImpl implements OrderService {
     public List<OrderDTO> getMyOrderByStatus(String username, String status) {
         List<Order> orders = orderRepository.findByUserUsernameAndStatus(username, status);
         return orders.stream().map(orderMapper::toOrderDTO).toList();
+    }
+
+    @Override
+    public Page<OrderSumaryDTO> getAllOrderSumary(Pageable pageable) {
+        Pageable sortedPageable = PageRequest.of(
+                pageable.getPageNumber(),
+                pageable.getPageSize(),
+                Sort.by(Sort.Direction.DESC, "id"));
+        return orderRepository.findAll(sortedPageable).map(orderMapper::toOrderSumaryDTO);
     }
 
 }

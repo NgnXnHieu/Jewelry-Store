@@ -1,5 +1,7 @@
 package com.example.jewelrystore.Controller;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -38,6 +40,11 @@ public class Order_DetailController {
     @GetMapping("/{id}")
     public Order_DetailDTO getOrder_DetailById(@PathVariable Integer id) {
         return service.getOrder_DetailById(id);
+    }
+
+    @GetMapping("/{orderId}/orderDetalils")
+    public List<Order_DetailDTO> getOrder_DetailByOrderId(@PathVariable Integer orderId) {
+        return service.getOrder_DetailsByOrderId(orderId);
     }
 
     @PostMapping

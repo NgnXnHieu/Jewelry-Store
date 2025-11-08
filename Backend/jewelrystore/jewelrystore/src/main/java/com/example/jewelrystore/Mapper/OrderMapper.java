@@ -9,6 +9,7 @@ import org.mapstruct.NullValuePropertyMappingStrategy;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.example.jewelrystore.DTO.OrderDTO;
+import com.example.jewelrystore.DTO.OrderSumaryDTO;
 import com.example.jewelrystore.Entity.Order;
 import com.example.jewelrystore.Form.OrderForm.OrderCreateForm;
 import com.example.jewelrystore.Form.OrderForm.OrderUpdateForm;
@@ -26,6 +27,10 @@ public abstract class OrderMapper {
     @Mapping(source = "user.id", target = "userId")
     public abstract OrderDTO toOrderDTO(Order order);
 
+    @Mapping(source = "user.id", target = "userId")
+    public abstract OrderSumaryDTO toOrderSumaryDTO(Order order);
+
+    // Chỉ update những field không null
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     public abstract void updateOrder(OrderUpdateForm form,
             @MappingTarget Order order);

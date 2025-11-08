@@ -1,13 +1,20 @@
 package com.example.jewelrystore.Controller;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -18,6 +25,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.example.jewelrystore.DTO.BestSellerDTO;
 import com.example.jewelrystore.DTO.ProductDTO;
@@ -27,6 +35,8 @@ import com.example.jewelrystore.Service.ProductService;
 
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
+import org.springframework.data.domain.Sort;
 
 // @CrossOrigin(origins = "http://localhost:5173")
 @RestController
@@ -38,13 +48,36 @@ public class ProductController {
 
     @GetMapping
     public Page<ProductDTO> getAll(Pageable pageable) {
-        return productService.getAllProduct(pageable);
+        // Custom lại phân trang để sắp xếp theo id giảm dần
+        Pageable sortedPageable = PageRequest.of(
+                pageable.getPageNumber(),
+                pageable.getPageSize(),
+                Sort.by(Sort.Direction.DESC, "id"));
+        return productService.getAllProduct(sortedPageable);
     }
 
-    @PostMapping
-    public ResponseEntity create(@RequestBody @Valid ProductCreateForm productCreateForm) {
-        ProductDTO created = productService.createProduct(productCreateForm);
-        return ResponseEntity.status(HttpStatus.CREATED).body(created);
+    @GetMapping("/productsByStatus")
+    public Page<ProductDTO> getAllByStockStatus(@RequestParam("status") String status, Pageable pageable) {
+        return productService.getProductsByStockStatus(status, pageable);
+    }
+
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<?> create(
+            @RequestParam("name") String name,
+            @RequestParam("price") Double price,
+            @RequestParam("quantity") Long quantity,
+            @RequestParam("description") String description,
+            @RequestParam(value = "image_url", required = false) String imageUrl,
+            @RequestParam("categoryId") Integer categoryId,
+            @RequestPart(value = "image", required = false) MultipartFile image,
+            @AuthenticationPrincipal UserDetails userDetails) {
+        if (userDetails != null) {
+            ProductCreateForm form = new ProductCreateForm(name, description, price, quantity, imageUrl, categoryId);
+            ProductDTO created = productService.createProduct(form, image, userDetails.getUsername());
+            return ResponseEntity.status(HttpStatus.CREATED).body(created);
+        } else {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized");
+        }
     }
 
     @GetMapping("/{id}")
@@ -53,8 +86,15 @@ public class ProductController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity update(@PathVariable Integer id, @RequestBody ProductUpdateForm userUpdateForm) {
-        ProductDTO updated = productService.updateProduct(id, userUpdateForm);
+    public ResponseEntity update(@PathVariable Integer id, @RequestParam("name") String name,
+            @RequestParam("price") Double price,
+            @RequestParam("quantity") Long quantity,
+            @RequestParam("description") String description,
+            @RequestParam(value = "image_url", required = false) String imageUrl,
+            @RequestParam("categoryId") Integer categoryId,
+            @RequestPart(value = "image", required = false) MultipartFile image) {
+        ProductUpdateForm form = new ProductUpdateForm(name, description, price, imageUrl, categoryId);
+        ProductDTO updated = productService.updateProduct(id, form, image);
         return (updated != null) ? ResponseEntity.ok(updated) : ResponseEntity.notFound().build();
     }
 
@@ -77,6 +117,31 @@ public class ProductController {
     @GetMapping("/bestSeller")
     public Page<BestSellerDTO> getBestSellerProduct(Pageable pageable) {
         return productService.getBestSellerProduct(pageable);
+    }
+
+    @PostMapping("/StockStats")
+    public ResponseEntity<Map<String, Long>> getStockStats(@RequestBody Map<String, Long> body) {
+        // nếu null thì trả về 0, còn nếu không thì lấy giá trị mặc định
+        Long all = Objects.requireNonNullElse(productService.getTotalQuantity(), 0L);
+        Long low = Objects.requireNonNullElse(
+                productService.countProductByQuantityBetween(body.get("minOfLow"), body.get("maxOfLow")), 0L);
+        Long out = Objects.requireNonNullElse(productService.countProductByQuantityBySpecificQuantity(body.get("out")),
+                0L);
+        Long in = Objects.requireNonNullElse(
+                productService.countProductByQuantityGreaterSpecificQuantity(body.get("in")),
+                0L);
+        Long countAllProducts = Objects.requireNonNullElse(productService.getCountAllProducts(), 0L);
+        // Các phần tử trong Map phải trùng tên với biến bên frontend nhận
+        Map<String, Long> result = new HashMap<>();
+        result.put("totalProducts", all);
+        result.put("lowStockCount", low);
+        result.put("outOfStockCount", out);
+        result.put("inStockCount", in);
+        result.put("totalUnits", countAllProducts);
+        // System.out.println("in result: " + result.get("outOfStockCount"));
+        // System.out.println("in out: " + out);
+
+        return ResponseEntity.ok(result);
     }
 
 }

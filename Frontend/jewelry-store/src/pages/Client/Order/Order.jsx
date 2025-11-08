@@ -17,7 +17,6 @@ export default function Order() {
             if (statusValue === "Tất cả") {
                 url = "http://localhost:8080/api/orders/myOrders";
             } else {
-                // ví dụ: /api/orders/myOrders?status=Đang giao hàng
                 url += `?status=${encodeURIComponent(statusValue)}`;
             }
 
@@ -61,7 +60,7 @@ export default function Order() {
         debounce((status) => {
             fetchOrders(status);
         }, 500),
-        [] // chỉ khởi tạo 1 lần
+        []
     );
 
     // 🔹 Gọi API khi lần đầu vào hoặc khi đổi trạng thái
@@ -79,13 +78,40 @@ export default function Order() {
         }
     };
 
-    if (loading) return <p className={styles.loading}>Đang tải dữ liệu...</p>;
+    const getStatusIcon = (status) => {
+        switch (status?.toLowerCase()) {
+            case "chờ xác nhận": return "⏳";
+            case "đã xác nhận": return "✓";
+            case "đang giao hàng": return "🚚";
+            case "đã nhận hàng": return "✨";
+            default: return "📦";
+        }
+    };
+
+    if (loading) {
+        return (
+            <div className={styles.container}>
+                <div className={styles.loadingContainer}>
+                    <div className={styles.spinner}></div>
+                    <p className={styles.loadingText}>Đang tải dữ liệu...</p>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className={styles.container}>
-            <h1 id={styles.title}>Lịch sử đơn hàng</h1>
+            {/* Header */}
+            <div className={styles.header}>
+                <div className={styles.headerContent}>
+                    <h1 className={styles.title}>📋 Lịch sử đơn hàng</h1>
+                    <p className={styles.subtitle}>
+                        Quản lý và theo dõi tất cả đơn hàng của bạn
+                    </p>
+                </div>
+            </div>
 
-            {/* 🔹 Thanh chọn trạng thái */}
+            {/* Filter Bar */}
             <div className={styles.filterBar}>
                 {["Tất cả", "Chờ xác nhận", "Đã xác nhận", "Đang giao hàng", "Đã nhận hàng"].map((status) => (
                     <button
@@ -93,78 +119,103 @@ export default function Order() {
                         className={`${styles.filterButton} ${selectedStatus === status ? styles.activeFilter : ""}`}
                         onClick={() => setSelectedStatus(status)}
                     >
-                        {status}
+                        {getStatusIcon(status)} {status}
                     </button>
                 ))}
             </div>
 
-            {orders.length === 0 ? (
-                <p className={styles.empty}>Không có đơn hàng nào với trạng thái này.</p>
-            ) : (
-                orders.map((order) => (
-                    <div key={order.id} className={styles.orderCard}>
-                        <div className={styles.orderHeader}>
-                            <div>
-                                <h2 className={styles.orderCode}>Mã đơn #{order.id}</h2>
-                                <p className={styles.orderDate}>
-                                    Ngày đặt: {new Date(order.orderDate).toLocaleString("vi-VN")}
-                                </p>
-                            </div>
-                            <span className={`${styles.status} ${getStatusClass(order.status)}`}>
-                                {order.status}
-                            </span>
-                        </div>
-
-                        <table className={styles.productTable}>
-                            <thead>
-                                <tr>
-                                    <th>#</th>
-                                    <th>Ảnh</th>
-                                    <th>Tên sản phẩm</th>
-                                    <th>Số lượng</th>
-                                    <th>Đơn giá</th>
-                                    <th>Thành tiền</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {order.orderDetails.map((detail, index) => (
-                                    <tr key={detail.id}>
-                                        <td>{index + 1}</td>
-                                        <td>
-                                            <img
-                                                src={detail.productImage || "https://via.placeholder.com/80"}
-                                                alt={detail.productName || "Sản phẩm"}
-                                                className={styles.image}
-                                            />
-                                        </td>
-                                        <td className={styles.nameCell}>
-                                            {detail.productName || `SP #${detail.productId}`}
-                                        </td>
-                                        <td>{detail.quantity}</td>
-                                        <td>{detail.price?.toLocaleString()}₫</td>
-                                        <td>{detail.totalPrice?.toLocaleString()}₫</td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-
-                        <div className={styles.footer}>
-                            <div className={styles.addressBox}>
-                                <p><strong>Địa chỉ giao hàng:</strong> {order.address}</p>
-                                <p><strong>SĐT:</strong> {order.phone}</p>
-                            </div>
-                            <div className={styles.totalBox}>
-                                <p className={styles.totalQuantity}>
-                                    <strong>Tổng số lượng: {order.quantity}</strong>
-                                </p>
-                                <p className={styles.totalAmount}>
-                                    <strong>Tổng tiền:</strong> {order.totalAmount?.toLocaleString()}₫
-                                </p>
-                            </div>
-                        </div>
+            {/* Orders List */}
+            <div className={styles.ordersContainer}>
+                {orders.length === 0 ? (
+                    <div className={styles.emptyState}>
+                        <div className={styles.emptyIcon}>📦</div>
+                        <h3 className={styles.emptyTitle}>Không có đơn hàng</h3>
+                        <p className={styles.emptyText}>
+                            Không có đơn hàng nào với trạng thái này.
+                        </p>
                     </div>
-                ))
-            )}
+                ) : (
+                    orders.map((order) => (
+                        <div key={order.id} className={styles.orderCard}>
+                            {/* Order Header */}
+                            <div className={styles.orderHeader}>
+                                <div className={styles.orderHeaderLeft}>
+                                    <h2 className={styles.orderCode}>Đơn hàng #{order.id}</h2>
+                                    <p className={styles.orderDate}>
+                                        📅 {new Date(order.orderDate).toLocaleString("vi-VN")}
+                                    </p>
+                                </div>
+                                <span className={`${styles.status} ${getStatusClass(order.status)}`}>
+                                    {getStatusIcon(order.status)} {order.status}
+                                </span>
+                            </div>
+
+                            {/* Products Grid */}
+                            <div className={styles.productsGrid}>
+                                {order.orderDetails.map((detail, index) => (
+                                    <div key={detail.id} className={styles.productCard}>
+                                        <div className={styles.productImage}>
+                                            <img
+                                                src={detail.productImage || "https://via.placeholder.com/120"}
+                                                alt={detail.productName || "Sản phẩm"}
+                                            />
+                                            <span className={styles.productIndex}>{index + 1}</span>
+                                        </div>
+                                        <div className={styles.productInfo}>
+                                            <h4 className={styles.productName}>
+                                                {detail.productName || `Sản phẩm #${detail.productId}`}
+                                            </h4>
+                                            <div className={styles.productDetails}>
+                                                <span className={styles.productQuantity}>
+                                                    SL: {detail.quantity}
+                                                </span>
+                                                <span className={styles.productPrice}>
+                                                    {detail.price?.toLocaleString()}₫
+                                                </span>
+                                            </div>
+                                            <p className={styles.productTotal}>
+                                                Tổng: <strong>{detail.totalPrice?.toLocaleString()}₫</strong>
+                                            </p>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+
+                            {/* Order Footer */}
+                            <div className={styles.orderFooter}>
+                                <div className={styles.deliveryInfo}>
+                                    <div className={styles.infoItem}>
+                                        <span className={styles.infoIcon}>📍</span>
+                                        <div>
+                                            <p className={styles.infoLabel}>Địa chỉ giao hàng</p>
+                                            <p className={styles.infoValue}>{order.address}</p>
+                                        </div>
+                                    </div>
+                                    <div className={styles.infoItem}>
+                                        <span className={styles.infoIcon}>📞</span>
+                                        <div>
+                                            <p className={styles.infoLabel}>Số điện thoại</p>
+                                            <p className={styles.infoValue}>{order.phone}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className={styles.orderSummary}>
+                                    <div className={styles.summaryRow}>
+                                        <span>Tổng số lượng:</span>
+                                        <strong>{order.quantity} sản phẩm</strong>
+                                    </div>
+                                    <div className={styles.summaryRow}>
+                                        <span>Tổng thanh toán:</span>
+                                        <strong className={styles.totalAmount}>
+                                            {order.totalAmount?.toLocaleString()}₫
+                                        </strong>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    ))
+                )}
+            </div>
         </div>
     );
 }
