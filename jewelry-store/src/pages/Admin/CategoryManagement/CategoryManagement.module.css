@@ -1,0 +1,261 @@
+/* ======= KHUNG CHUNG ======= */
+.container {
+    padding: 32px;
+    background: linear-gradient(135deg, #f5f7fa 0%, #e9ecef 100%);
+    min-height: 100vh;
+    font-family: "Inter", sans-serif;
+}
+
+/* ======= TIÊU ĐỀ TRANG ======= */
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-bottom: 32px;
+}
+
+.header h2 {
+    flex: 1;
+    text-align: center;
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: #1e293b;
+    margin: 0;
+    letter-spacing: 0.5px;
+}
+
+/* ======= NÚT THÊM ======= */
+.addBtn {
+    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+.addBtn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
+}
+
+/* ======= BẢNG ======= */
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+
+.table th,
+.table td {
+    padding: 16px;
+    border-bottom: 1px solid #f1f5f9;
+    text-align: center;
+    font-size: 0.95rem;
+    color: #334155;
+}
+
+.table th {
+    background: linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%);
+    color: #475569;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.table tr:hover {
+    background-color: #f8fafc;
+}
+
+/* ======= HÀNH ĐỘNG ======= */
+.table td:last-child {
+    text-align: center;
+}
+
+.actionButtons {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+}
+
+.editBtn,
+.deleteBtn {
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    background: whitesmoke;
+    transition: all 0.2s ease;
+    padding: 8px;
+    /* display: flex; */
+    align-items: center;
+    justify-content: center;
+    margin-right: 10px;
+}
+
+.editBtn {
+    color: #10b981;
+}
+
+.editBtn:hover {
+    background: #d1fae5;
+    transform: scale(1.1);
+}
+
+.deleteBtn {
+    color: #ef4444;
+}
+
+.deleteBtn:hover {
+    background: #fee2e2;
+    transform: scale(1.1);
+}
+
+/* ======= DIALOG ======= */
+.dialogBackdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(4px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+.dialog {
+    background: white;
+    border-radius: 16px;
+    width: 450px;
+    max-width: 95%;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    animation: slideUp 0.4s ease;
+    padding: 24px 50px;
+    text-align: center;
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px) scale(0.95);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.dialog h3 {
+    font-size: 1.4rem;
+    font-weight: 600;
+    color: #1e293b;
+    margin-bottom: 20px;
+}
+
+/* Input */
+.dialog input {
+    width: 100%;
+    border: 2px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 12px 14px;
+    font-size: 0.95rem;
+    outline: none;
+    background: #f8fafc;
+    transition: all 0.3s ease;
+}
+
+.dialog input:focus {
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    background: white;
+}
+
+/* Lỗi */
+.error {
+    color: #ef4444;
+    font-size: 0.85rem;
+    margin-top: 6px;
+}
+
+/* Nút trong dialog */
+.dialogActions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 24px;
+    border-top: 2px solid #f1f5f9;
+    padding-top: 16px;
+}
+
+.saveBtn,
+.cancelBtn {
+    padding: 10px 22px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-weight: 500;
+}
+
+.saveBtn {
+    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+    color: white;
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+.saveBtn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
+}
+
+.cancelBtn {
+    background: #e2e8f0;
+    color: #475569;
+}
+
+.cancelBtn:hover {
+    background: #cbd5e1;
+    transform: translateY(-2px);
+}
+
+/* ======= RESPONSIVE ======= */
+@media (max-width: 768px) {
+    .header {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .addBtn {
+        width: 100%;
+        padding: 14px;
+    }
+
+    .dialog {
+        width: 90%;
+    }
+
+    .table th,
+    .table td {
+        padding: 12px 8px;
+        font-size: 0.9rem;
+        text-align: center;
+    }
+}
