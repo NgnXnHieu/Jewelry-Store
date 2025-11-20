@@ -1,5 +1,6 @@
 package com.example.jewelrystore.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
@@ -9,6 +10,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.example.jewelrystore.DTO.BestSellerDTO;
 import com.example.jewelrystore.DTO.ProductDTO;
+import com.example.jewelrystore.Entity.Category;
 import com.example.jewelrystore.Form.ProductForm.ProductCreateForm;
 import com.example.jewelrystore.Form.ProductForm.ProductUpdateForm;
 
@@ -40,5 +42,15 @@ public interface ProductService {
     Long countProductByQuantityGreaterSpecificQuantity(Long quantity);
 
     Long getCountAllProducts();
+
+    Long getCountInProducts();
+
+    Long getCountOutProducts();
+
+    Map<String, Long> getStockStats(Map<String, Long> body);
+
+    Map<String, Object> getBestSellerProductByUnitTime(String time);
+
+    Map<String, Object> getTopAndBotSellingCategories(String time);
 
 }

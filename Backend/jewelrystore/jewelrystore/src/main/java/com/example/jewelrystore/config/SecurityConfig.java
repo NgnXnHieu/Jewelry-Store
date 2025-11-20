@@ -19,6 +19,8 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import jakarta.servlet.http.HttpServletResponse;
+
 @Configuration
 public class SecurityConfig {
     @Autowired
@@ -32,11 +34,13 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .csrf(AbstractHttpConfigurer::disable)
+                // .csrf(AbstractHttpConfigurer::disable)
+                .csrf(csrf -> csrf.disable())
                 .cors(cors -> cors.configurationSource(corsConfigurationSource())) // ✅ bật CORS
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                        .requestMatchers("/api/refreshToken", "/api/register", "/api/login", "/api/forEverybody")
+                        .requestMatchers("/api/refreshToken", "/api/register", "/api/login", "/api/forEverybody",
+                                "/api/webhook/sepay")
                         .permitAll() // không cần xác thực
                         .requestMatchers("/api/logout")
                         .hasAnyRole("USER", "STAFF", "MANAGER", "SHIPPER", "ADMIN")
@@ -47,14 +51,24 @@ public class SecurityConfig {
                         .requestMatchers("/api/users")
                         // .hasRole("ADMIN")
                         .permitAll()
-                        .requestMatchers("/api/products", "/api/products/{id}", "/api/products/getRelatedProducts/{id}")
-                        .permitAll()
-                        .requestMatchers("/api/users/infor")
+                        // .requestMatchers("/api/products", "/api/products/{id}",
+                        // "/api/products/getRelatedProducts/{id}")
+                        // .permitAll()
+                        .requestMatchers("/api/users/infor", "/api/cart_details/cart_detailsByUserName")
                         .authenticated()
                         // .hasAnyRole("USER", "ADMIN")
                         // .anyRequest().authenticated() // các request khác cần xác thực
                         .anyRequest().permitAll())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                // 1. SỬA LỖI 403: Thêm khối này
+                .exceptionHandling(ex -> ex
+                        .authenticationEntryPoint((request, response, authException) -> {
+                            // Khi người dùng chưa xác thực (anonymous) truy cập tài nguyên cần bảo vệ
+                            // Trả về lỗi 401 thay vì 403
+                            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                            response.getWriter().write("Unauthorized: " + authException.getMessage());
+                        }))
+                // add 1 vài filer sẽ chạy trước
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
         ;
 

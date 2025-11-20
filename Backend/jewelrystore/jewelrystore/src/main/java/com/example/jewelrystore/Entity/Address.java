@@ -104,4 +104,8 @@ public class Address {
                 + district + ", is_defaut=" + is_defaut + ", user=" + user + "]";
     }
 
+    public String getDetailAddress() {
+        return this.getVillage() + ", " + this.getWard() + ", " + this.getDistrict();
+    }
+
 }

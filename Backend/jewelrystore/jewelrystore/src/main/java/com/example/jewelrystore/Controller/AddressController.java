@@ -2,6 +2,7 @@ package com.example.jewelrystore.Controller;
 
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 
 import com.example.jewelrystore.DTO.AddressDTO;
 import com.example.jewelrystore.Form.AddressForm.AddressCreateForm;
@@ -80,8 +81,7 @@ public class AddressController {
     public List<AddressDTO> getAllAddressesByUsername(@AuthenticationPrincipal UserDetails userDetails) {
         if (userDetails == null) {
             // return null; // hoặc ném exception 401
-            throw new AccessDeniedException("You don't have permission to change quantity this item");
-
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Bạn cần đăng nhập");
         }
         return service.getAllAddressesByUsername(userDetails.getUsername());
     }

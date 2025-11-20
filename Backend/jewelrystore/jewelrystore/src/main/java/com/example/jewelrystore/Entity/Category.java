@@ -1,11 +1,15 @@
 package com.example.jewelrystore.Entity;
 
+import java.util.List;
+
 import io.micrometer.common.lang.NonNull;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 
 @Entity
@@ -16,6 +20,9 @@ public class Category {
     private Integer id;
     @Column(length = 200, nullable = false, unique = true)
     private String name;
+
+    // @OneToMany(mappedBy = "category", cascade = CascadeType.ALL)
+    // private List<Product> products;
 
     public Category() {
     }
@@ -45,5 +52,13 @@ public class Category {
     public String toString() {
         return "Category [id=" + id + ", name=" + name + "]";
     }
+
+    // public List<Product> getProducts() {
+    // return products;
+    // }
+
+    // public void setProducts(List<Product> products) {
+    // this.products = products;
+    // }
 
 }

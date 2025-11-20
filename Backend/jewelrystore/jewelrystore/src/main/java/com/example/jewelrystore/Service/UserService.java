@@ -1,5 +1,7 @@
 package com.example.jewelrystore.Service;
 
+import java.util.List;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.multipart.MultipartFile;
@@ -25,4 +27,25 @@ public interface UserService {
     void deleteUser(Integer id);
 
     UserDTO getInfor(String username);
+
+    Long getCountUsersByRoleBetweenDates(String time, String role);
+
+    Long getCountUserNotRoleBetweenDates(String time, String role);
+
+    Long getCountByRoleNot(String role);
+
+    Long getCountByRole(String Role);
+
+    List<Long> getCountCustomersByYears();
+
+    List<Long> getCountCustomersByMonths();
+
+    List<Long> getCountCustomersByDays();
+
+    List<Long> getCountHumanResoucesByYears();
+
+    List<Long> getCountHumanResoucesByMonths();
+
+    List<Long> getCountHumanResoucesByDays();
+
 }

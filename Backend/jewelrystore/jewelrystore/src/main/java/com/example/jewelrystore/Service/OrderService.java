@@ -28,4 +28,31 @@ public interface OrderService {
     OrderDTO createMyOrder(OrderCreateForm orderCreateForm, String username);
 
     List<OrderDTO> getMyOrderByStatus(String username, String status);
+
+    Double getTotalAmountByTimeUnit(String time);
+
+    Long getcountOrdersByTimeUnit(String time);
+
+    Double getMaxPriceOfOrdersByTimeUnit(String time);
+
+    Double getRevenuePerDay(String time);
+
+    Long getCountOrderNotDeliveredByUnitTime(String time);
+
+    Long getCountOrderDeliveredByUnitTime(String time);
+
+    Double getCountOrderPerDayByUnitTime(String time);
+
+    List<Double> getSumTotalPriceByYearsByDateAndStatus();
+
+    List<Double> getSumTotalPriceByMonthsByDateAndStatus();
+
+    List<Double> getSumTotalPriceByDaysByDateAndStatus();
+
+    List<Long> countOrdersByYears();
+
+    List<Long> countOrdersByMonths();
+
+    List<Long> countOrdersByDays();
+
 }

@@ -5,9 +5,16 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.YearMonth;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -24,11 +31,14 @@ import com.example.jewelrystore.DTO.BestSellerDTO;
 import com.example.jewelrystore.DTO.ProductDTO;
 import com.example.jewelrystore.Entity.Category;
 import com.example.jewelrystore.Entity.Inventory_History;
+import com.example.jewelrystore.Entity.Order_Detail;
 import com.example.jewelrystore.Entity.Product;
 import com.example.jewelrystore.Entity.User;
 import com.example.jewelrystore.Form.ProductForm.ProductCreateForm;
 import com.example.jewelrystore.Form.ProductForm.ProductUpdateForm;
 import com.example.jewelrystore.Mapper.ProductMapper;
+import com.example.jewelrystore.Repository.CategoryRepository;
+import com.example.jewelrystore.Repository.Order_DetailRepository;
 import com.example.jewelrystore.Repository.ProductRepository;
 import com.example.jewelrystore.Repository.UserRepository;
 import com.example.jewelrystore.Service.ProductService;
@@ -44,6 +54,10 @@ public class ProductImpl implements ProductService {
     private ProductMapper productMapper;
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private Order_DetailRepository order_DetailRepository;
+    @Autowired
+    private CategoryRepository categoryRepository;
 
     // @Override
     // public ProductDTO createProduct(ProductCreateForm Form, MultipartFile image)
@@ -101,9 +115,9 @@ public class ProductImpl implements ProductService {
 
                 // ✅ Resize ảnh về kích thước 500x500 và lưu xuống
                 Thumbnails.of(image.getInputStream())
-                        .size(700, 700)
+                        .size(1400, 1400)
                         .keepAspectRatio(true) // giữ tỉ lệ gốc, không méo hình
-                        .outputQuality(0.85) // giảm dung lượng, 85% chất lượng
+                        .outputQuality(1) // giảm dung lượng, 85% chất lượng
                         .toFile(filePath.toFile());
 
                 imagePath = fileName;
@@ -154,9 +168,9 @@ public class ProductImpl implements ProductService {
 
                     // ✅ Resize ảnh về kích thước 700x700 và lưu xuống
                     Thumbnails.of(image.getInputStream())
-                            .size(700, 700)
+                            .size(1400, 1400)
                             .keepAspectRatio(true) // giữ tỉ lệ gốc, không méo hình
-                            .outputQuality(0.85) // giảm dung lượng, 85% chất lượng
+                            .outputQuality(1) // giảm dung lượng, 85% chất lượng
                             .toFile(filePath.toFile());
 
                     imagePath = fileName;
@@ -262,4 +276,275 @@ public class ProductImpl implements ProductService {
     public Long getCountAllProducts() {
         return productRepository.countAllProducts();
     }
+
+    @Override
+    public Long getCountInProducts() {
+        return productRepository.countProductByQuantityGreaterSpecificQuantity(0L);
+    }
+
+    @Override
+    public Long getCountOutProducts() {
+        return productRepository.countProductByQuantityBySpecificQuantity(0L);
+    }
+
+    // Trả về số lượng hiện tại của các trạng thái sản phẩm
+    @Override
+    public Map<String, Long> getStockStats(Map<String, Long> body) {
+        // nếu null thì trả về 0, còn nếu không thì lấy giá trị mặc định
+        Long all = Objects.requireNonNullElse(productRepository.getTotalQuantity(), 0L);
+        Long low = Objects.requireNonNullElse(
+                productRepository.countProductByQuantityBetween(body.get("minOfLow"), body.get("maxOfLow")), 0L);
+        Long out = Objects.requireNonNullElse(
+                productRepository.countProductByQuantityBySpecificQuantity(body.get("out")),
+                0L);
+        Long in = Objects.requireNonNullElse(
+                productRepository.countProductByQuantityGreaterSpecificQuantity(body.get("in")),
+                0L);
+        Long countAllProducts = Objects.requireNonNullElse(productRepository.countAllProducts(), 0L);
+        // Các phần tử trong Map phải trùng tên với biến bên frontend nhận
+        Map<String, Long> result = new HashMap<>();
+        result.put("totalProducts", all);
+        result.put("lowStockCount", low);
+        result.put("outOfStockCount", out);
+        result.put("inStockCount", in);
+        result.put("totalUnits", countAllProducts);
+        // System.out.println("in result: " + result.get("outOfStockCount"));
+        // System.out.println("in out: " + out);
+        return result;
+    }
+
+    @Override
+    public Map<String, Object> getBestSellerProductByUnitTime(String time) {
+        if (time.equalsIgnoreCase("year")) {
+            try {
+                int thisYear = LocalDate.now().getYear();
+                LocalDateTime startDateTime = LocalDate.of(thisYear, 1, 1).atStartOfDay();
+                LocalDateTime endDateTime = LocalDateTime.of(thisYear, 12, 31, 23, 59, 59);
+                List<Order_Detail> order_Details = order_DetailRepository.findByOrder_OrderDateBetween(startDateTime,
+                        endDateTime);
+                Map<Product, Long> productsTotal = new HashMap<>();
+                for (Order_Detail od : order_Details) {
+                    Product product = od.getProduct();
+                    // Lấy giá trị của key(nếu key chưa tồn tại trả về mặc định 0)
+                    productsTotal.put(product, productsTotal.getOrDefault(product, 0L) + od.getQuantity());
+                }
+                Product product = productsTotal.entrySet().stream()
+                        .max(Map.Entry.comparingByValue())
+                        .map(Map.Entry::getKey).orElse(null);
+
+                Map<String, Object> result = new HashMap<>();
+                result.put("producId", product.getId());
+                result.put("productName", product.getName());
+                result.put("sellQuantity", productsTotal.get(product));
+                return result;
+            } catch (NullPointerException e) {
+                System.out.println(e);
+            }
+        } else if (time.equalsIgnoreCase("day")) {
+            try {
+                LocalDateTime startDateTime = LocalDate.now().atStartOfDay();
+                LocalDateTime endDateTime = LocalDate.now().atTime(23, 59, 59);
+                List<Order_Detail> order_Details = order_DetailRepository.findByOrder_OrderDateBetween(startDateTime,
+                        endDateTime);
+                Map<Product, Long> productsTotal = new HashMap<>();
+                for (Order_Detail od : order_Details) {
+                    Product product = od.getProduct();
+                    // Lấy giá trị của key(nếu key chưa tồn tại trả về mặc định 0)
+                    productsTotal.put(product, productsTotal.getOrDefault(product, 0L) + od.getQuantity());
+                }
+                Product product = productsTotal.entrySet().stream()
+                        .max(Map.Entry.comparingByValue())
+                        .map(Map.Entry::getKey).orElse(null);
+
+                Map<String, Object> result = new HashMap<>();
+                result.put("producId", product.getId());
+                result.put("productName", product.getName());
+                result.put("sellQuantity", productsTotal.get(product));
+                return result;
+            } catch (NullPointerException e) {
+                System.out.println(e);
+            }
+        } else {
+            try {
+                YearMonth yearMonth = YearMonth.now();
+                LocalDateTime startDateTime = yearMonth.atDay(1).atStartOfDay();
+                LocalDateTime endDateTime = yearMonth.atEndOfMonth().atTime(23, 59, 59);
+                List<Order_Detail> order_Details = order_DetailRepository.findByOrder_OrderDateBetween(startDateTime,
+                        endDateTime);
+                Map<Product, Long> productsTotal = new HashMap<>();
+                for (Order_Detail od : order_Details) {
+                    Product product = od.getProduct();
+                    // Lấy giá trị của key(nếu key chưa tồn tại trả về mặc định 0)
+                    productsTotal.put(product, productsTotal.getOrDefault(product, 0L) + od.getQuantity());
+                }
+                Product product = productsTotal.entrySet().stream()
+                        .max(Map.Entry.comparingByValue())
+                        .map(Map.Entry::getKey).orElse(null);
+
+                Map<String, Object> result = new HashMap<>();
+                result.put("producId", product.getId());
+                result.put("productName", product.getName());
+                result.put("sellQuantity", productsTotal.get(product));
+                return result;
+            } catch (NullPointerException e) {
+                System.out.println(e);
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public Map<String, Object> getTopAndBotSellingCategories(String time) {
+        if (time.equalsIgnoreCase("year")) {
+            try {
+                int thisYear = LocalDate.now().getYear();
+                LocalDateTime startDateTime = LocalDate.of(thisYear, 1, 1).atStartOfDay();
+                LocalDateTime endDateTime = LocalDateTime.of(thisYear, 12, 31, 23, 59, 59);
+                List<Order_Detail> order_Details = order_DetailRepository.findByOrder_OrderDateBetween(startDateTime,
+                        endDateTime);
+                Map<Category, Long> selling = new HashMap<>();
+                List<Category> categories = categoryRepository.findAll();
+                for (Category category : categories) {
+                    Integer id = category.getId();
+                    long quantity = 0;
+                    Iterator<Order_Detail> it = order_Details.iterator();
+
+                    while (it.hasNext()) {
+                        Order_Detail o = it.next();
+                        if (o.getProduct().getCategory().getId().equals(id)) {
+                            quantity += o.getQuantity();
+                            it.remove();
+                        }
+                    }
+                    selling.put(category, quantity);
+                }
+
+                Map.Entry<Category, Long> maxEntry = selling.entrySet()
+                        .stream()
+                        .max(Map.Entry.comparingByValue())
+                        .orElse(null);
+
+                Map.Entry<Category, Long> minEntry = selling.entrySet()
+                        .stream()
+                        .min(Map.Entry.comparingByValue())
+                        .orElse(null);
+                Map<String, Object> maxCategory = new HashMap();
+                maxCategory.put("categoryId", maxEntry.getKey().getId());
+                maxCategory.put("categoryName", maxEntry.getKey().getName());
+                maxCategory.put("quantity", maxEntry.getValue());
+                Map<String, Object> minCategory = new HashMap();
+                minCategory.put("categoryId", minEntry.getKey().getId());
+                minCategory.put("categoryName", minEntry.getKey().getName());
+                minCategory.put("quantity", minEntry.getValue());
+                Map<String, Object> result = new HashMap<>();
+                result.put("maxCategory", maxCategory);
+                result.put("minCategory", minCategory);
+
+                return result;
+            } catch (NullPointerException e) {
+                System.out.println(e);
+            }
+        } else if (time.equalsIgnoreCase("day")) {
+            try {
+                LocalDateTime startDateTime = LocalDate.now().atStartOfDay();
+                LocalDateTime endDateTime = LocalDate.now().atTime(23, 59, 59);
+                List<Order_Detail> order_Details = order_DetailRepository.findByOrder_OrderDateBetween(startDateTime,
+                        endDateTime);
+                Map<Category, Long> selling = new HashMap<>();
+                List<Category> categories = categoryRepository.findAll();
+                int n = categories.size();
+                for (Category category : categories) {
+                    Integer id = category.getId();
+                    long quantity = 0;
+                    Iterator<Order_Detail> it = order_Details.iterator();
+
+                    while (it.hasNext()) {
+                        Order_Detail o = it.next();
+                        if (o.getProduct().getCategory().getId().equals(id)) {
+                            quantity += o.getQuantity();
+                            it.remove();
+                        }
+                    }
+                    selling.put(category, quantity);
+                }
+
+                Map.Entry<Category, Long> maxEntry = selling.entrySet()
+                        .stream()
+                        .max(Map.Entry.comparingByValue())
+                        .orElse(null);
+
+                Map.Entry<Category, Long> minEntry = selling.entrySet()
+                        .stream()
+                        .min(Map.Entry.comparingByValue())
+                        .orElse(null);
+
+                Map<String, Object> maxCategory = new HashMap();
+                maxCategory.put("categoryId", maxEntry.getKey().getId());
+                maxCategory.put("categoryName", maxEntry.getKey().getName());
+                maxCategory.put("quantity", maxEntry.getValue());
+                Map<String, Object> minCategory = new HashMap();
+                minCategory.put("categoryId", minEntry.getKey().getId());
+                minCategory.put("categoryName", minEntry.getKey().getName());
+                minCategory.put("quantity", minEntry.getValue());
+                Map<String, Object> result = new HashMap<>();
+                result.put("maxCategory", maxCategory);
+                result.put("minCategory", minCategory);
+                return result;
+            } catch (NullPointerException e) {
+                System.out.println(e);
+            }
+        } else {
+            try {
+                YearMonth yearMonth = YearMonth.now();
+                LocalDateTime startDateTime = yearMonth.atDay(1).atStartOfDay();
+                LocalDateTime endDateTime = yearMonth.atEndOfMonth().atTime(23, 59, 59);
+                List<Order_Detail> order_Details = order_DetailRepository.findByOrder_OrderDateBetween(startDateTime,
+                        endDateTime);
+                Map<Category, Long> selling = new HashMap<>();
+                List<Category> categories = categoryRepository.findAll();
+                int n = categories.size();
+                for (Category category : categories) {
+                    Integer id = category.getId();
+                    long quantity = 0;
+                    Iterator<Order_Detail> it = order_Details.iterator();
+
+                    while (it.hasNext()) {
+                        Order_Detail o = it.next();
+                        if (o.getProduct().getCategory().getId().equals(id)) {
+                            quantity += o.getQuantity();
+                            it.remove();
+                        }
+                    }
+                    selling.put(category, quantity);
+                }
+
+                Map.Entry<Category, Long> maxEntry = selling.entrySet()
+                        .stream()
+                        .max(Map.Entry.comparingByValue())
+                        .orElse(null);
+
+                Map.Entry<Category, Long> minEntry = selling.entrySet()
+                        .stream()
+                        .min(Map.Entry.comparingByValue())
+                        .orElse(null);
+
+                Map<String, Object> maxCategory = new HashMap();
+                maxCategory.put("categoryId", maxEntry.getKey().getId());
+                maxCategory.put("categoryName", maxEntry.getKey().getName());
+                maxCategory.put("quantity", maxEntry.getValue());
+                Map<String, Object> minCategory = new HashMap();
+                minCategory.put("categoryId", minEntry.getKey().getId());
+                minCategory.put("categoryName", minEntry.getKey().getName());
+                minCategory.put("quantity", minEntry.getValue());
+                Map<String, Object> result = new HashMap<>();
+                result.put("maxCategory", maxCategory);
+                result.put("minCategory", minCategory);
+                return result;
+            } catch (NullPointerException e) {
+                System.out.println(e);
+            }
+        }
+        return null;
+    }
+
 }

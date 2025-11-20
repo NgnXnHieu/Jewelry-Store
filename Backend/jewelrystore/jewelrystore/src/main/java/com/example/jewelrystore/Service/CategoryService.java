@@ -21,4 +21,6 @@ public interface CategoryService {
     CategoryDTO getCategoryById(Integer id);
 
     void deleteCategory(Integer id);
+
+    Long getCountCategory();
 }

@@ -23,6 +23,7 @@ import com.example.jewelrystore.Form.CategoryForm.CategoryUpdateForm;
 import com.example.jewelrystore.Service.CategoryService;
 
 import jakarta.validation.Valid;
+import org.springframework.web.bind.annotation.RequestParam;
 
 @RestController
 @RequestMapping("/api/categories")
@@ -63,6 +64,12 @@ public class CategoryController {
     public String delete(@PathVariable Integer id) {
         service.deleteCategory(id);
         return "Xóa thành công";
+    }
+
+    @GetMapping("/count")
+    public ResponseEntity<Long> getTotalCategoriesQuantity() {
+        Long total = service.getCountCategory();
+        return ResponseEntity.ok(total);
     }
 
 }

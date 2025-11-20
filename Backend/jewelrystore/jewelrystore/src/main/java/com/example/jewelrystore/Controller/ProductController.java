@@ -29,6 +29,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.example.jewelrystore.DTO.BestSellerDTO;
 import com.example.jewelrystore.DTO.ProductDTO;
+import com.example.jewelrystore.Entity.Category;
 import com.example.jewelrystore.Form.ProductForm.ProductCreateForm;
 import com.example.jewelrystore.Form.ProductForm.ProductUpdateForm;
 import com.example.jewelrystore.Service.ProductService;
@@ -121,27 +122,38 @@ public class ProductController {
 
     @PostMapping("/StockStats")
     public ResponseEntity<Map<String, Long>> getStockStats(@RequestBody Map<String, Long> body) {
-        // nếu null thì trả về 0, còn nếu không thì lấy giá trị mặc định
-        Long all = Objects.requireNonNullElse(productService.getTotalQuantity(), 0L);
-        Long low = Objects.requireNonNullElse(
-                productService.countProductByQuantityBetween(body.get("minOfLow"), body.get("maxOfLow")), 0L);
-        Long out = Objects.requireNonNullElse(productService.countProductByQuantityBySpecificQuantity(body.get("out")),
-                0L);
-        Long in = Objects.requireNonNullElse(
-                productService.countProductByQuantityGreaterSpecificQuantity(body.get("in")),
-                0L);
-        Long countAllProducts = Objects.requireNonNullElse(productService.getCountAllProducts(), 0L);
-        // Các phần tử trong Map phải trùng tên với biến bên frontend nhận
-        Map<String, Long> result = new HashMap<>();
-        result.put("totalProducts", all);
-        result.put("lowStockCount", low);
-        result.put("outOfStockCount", out);
-        result.put("inStockCount", in);
-        result.put("totalUnits", countAllProducts);
-        // System.out.println("in result: " + result.get("outOfStockCount"));
-        // System.out.println("in out: " + out);
+        return ResponseEntity.ok(productService.getStockStats(body));
+    }
 
-        return ResponseEntity.ok(result);
+    // Đếm tổng số sản phẩm
+    @GetMapping("/count")
+    public ResponseEntity<Long> getTotalProducts() {
+        Long total = productService.getCountAllProducts();
+        return ResponseEntity.ok(total);
+    }
+
+    // Đếm tổng số sản phẩm tồn kho
+    @GetMapping("inProducts/count")
+    public Long getCountInProducts() {
+        return productService.getCountInProducts();
+    }
+
+    // Đếm tổng số sản phẩm hết hàng
+    @GetMapping("outProducts/count")
+    public Long getCountOutProducts() {
+        return productService.getCountOutProducts();
+    }
+
+    // Lấy ra mã, tên và số lượng sản phẩm bán chạy nhất theo kiểu thời gian(unit
+    // time)
+    @GetMapping("oneBestSeller")
+    public Map<String, Object> getBestSellerProductByUnitTime(@RequestParam String time) {
+        return productService.getBestSellerProductByUnitTime(time);
+    }
+
+    @GetMapping("TopAndBotSellingCategories")
+    public Map<String, Object> getTopAndBotSellingCategories(@RequestParam String time) {
+        return productService.getTopAndBotSellingCategories(time);
     }
 
 }

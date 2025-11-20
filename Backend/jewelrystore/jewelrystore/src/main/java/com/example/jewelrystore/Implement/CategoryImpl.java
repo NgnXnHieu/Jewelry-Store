@@ -61,4 +61,9 @@ public class CategoryImpl implements CategoryService {
         return categoryRepository.findAll().stream().map(categoryMapper::toCategoryDTO).toList();
     }
 
+    @Override
+    public Long getCountCategory() {
+        return categoryRepository.countAllCategory();
+    }
+
 }

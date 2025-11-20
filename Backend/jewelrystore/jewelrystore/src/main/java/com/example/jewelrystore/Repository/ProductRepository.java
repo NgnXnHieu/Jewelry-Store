@@ -1,5 +1,8 @@
 package com.example.jewelrystore.Repository;
 
+import java.time.LocalDate;
+import java.util.List;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -8,6 +11,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import com.example.jewelrystore.DTO.BestSellerDTO;
+import com.example.jewelrystore.Entity.Category;
 import com.example.jewelrystore.Entity.Product;
 
 @Repository

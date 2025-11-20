@@ -4,8 +4,12 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.YearMonth;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -72,9 +76,9 @@ public class UserImpl implements UserService {
 
                     // ✅ Resize ảnh về kích thước 500x500 và lưu xuống
                     Thumbnails.of(image.getInputStream())
-                            .size(700, 700)
+                            .size(1400, 1400)
                             .keepAspectRatio(true) // giữ tỉ lệ gốc, không méo hình
-                            .outputQuality(0.85) // giảm dung lượng, 85% chất lượng
+                            .outputQuality(1) // giảm dung lượng, 85% chất lượng
                             .toFile(filePath.toFile());
 
                     imagePath = fileName;
@@ -140,9 +144,9 @@ public class UserImpl implements UserService {
 
                     // ✅ Resize ảnh về kích thước 500x500 và lưu xuống
                     Thumbnails.of(image.getInputStream())
-                            .size(700, 700)
+                            .size(1400, 1400)
                             .keepAspectRatio(true) // giữ tỉ lệ gốc, không méo hình
-                            .outputQuality(0.85) // giảm dung lượng, 85% chất lượng
+                            .outputQuality(1) // giảm dung lượng, 85% chất lượng
                             .toFile(filePath.toFile());
 
                     imagePath = fileName;
@@ -174,5 +178,158 @@ public class UserImpl implements UserService {
                 Sort.by(Sort.Direction.DESC, "id"));
         return userRepository.findByRoleNot("CUSTOMER", sortedPageable).map(userMapper::toUserDTO);
 
+    }
+
+    @Override
+    public Long getCountUsersByRoleBetweenDates(String time, String role) {
+        if (time.equalsIgnoreCase("year")) {
+            int thisYear = LocalDate.now().getYear();
+            LocalDateTime startDateTime = LocalDateTime.of(thisYear, 1, 1, 0, 0, 0);
+            LocalDateTime endDateTime = LocalDateTime.of(thisYear, 12, 31, 23, 59, 59);
+            return Objects.requireNonNullElse(
+                    userRepository.getCountUserByRoleBetweenDates(role, startDateTime, endDateTime),
+                    0L);
+        } else if (time.equalsIgnoreCase("month")) {
+            int thisYear = LocalDate.now().getYear();
+            int thisMonth = LocalDate.now().getMonthValue();
+            YearMonth yearMonth = YearMonth.of(thisYear, thisMonth);
+            LocalDateTime startDateTime = yearMonth.atDay(1).atStartOfDay();
+            LocalDateTime endDateTime = yearMonth.atEndOfMonth().atTime(23, 59, 59);
+            return Objects.requireNonNullElse(
+                    userRepository.getCountUserByRoleBetweenDates(role, startDateTime, endDateTime),
+                    0L);
+        } else if (time.equalsIgnoreCase("day")) {
+            LocalDate today = LocalDate.now();
+            LocalDateTime startDateTime = today.atStartOfDay();
+            LocalDateTime endDateTime = today.atTime(23, 59, 59);
+            return Objects.requireNonNullElse(
+                    userRepository.getCountUserByRoleBetweenDates(role, startDateTime, endDateTime),
+                    0L);
+        }
+        return 0L;
+    }
+
+    @Override
+    public Long getCountUserNotRoleBetweenDates(String time, String role) {
+        if (time.equalsIgnoreCase("year")) {
+            int thisYear = LocalDate.now().getYear();
+            LocalDateTime startDateTime = LocalDateTime.of(thisYear, 1, 1, 0, 0, 0);
+            LocalDateTime endDateTime = LocalDateTime.of(thisYear, 12, 31, 23, 59, 59);
+            return Objects.requireNonNullElse(
+                    userRepository.getCountUserNotRoleBetweenDates(role, startDateTime, endDateTime),
+                    0L);
+        } else if (time.equalsIgnoreCase("month")) {
+            int thisYear = LocalDate.now().getYear();
+            int thisMonth = LocalDate.now().getMonthValue();
+            YearMonth yearMonth = YearMonth.of(thisYear, thisMonth);
+            LocalDateTime startDateTime = yearMonth.atDay(1).atStartOfDay();
+            LocalDateTime endDateTime = yearMonth.atEndOfMonth().atTime(23, 59, 59);
+            return Objects.requireNonNullElse(
+                    userRepository.getCountUserNotRoleBetweenDates(role, startDateTime, endDateTime),
+                    0L);
+        } else if (time.equalsIgnoreCase("day")) {
+            LocalDate today = LocalDate.now();
+            LocalDateTime startDateTime = today.atStartOfDay();
+            LocalDateTime endDateTime = today.atTime(23, 59, 59);
+            return Objects.requireNonNullElse(
+                    userRepository.getCountUserNotRoleBetweenDates(role, startDateTime, endDateTime),
+                    0L);
+        }
+        return 0L;
+    }
+
+    @Override
+    public Long getCountByRoleNot(String role) {
+        return Objects.requireNonNullElse(userRepository.countByRoleNot(role), 0L);
+    }
+
+    @Override
+    public Long getCountByRole(String role) {
+        return Objects.requireNonNullElse(userRepository.countByRole(role), 0L);
+
+    }
+
+    @Override
+    public List<Long> getCountCustomersByYears() {
+        List<Long> results = new ArrayList<>();
+        int year = LocalDate.now().getYear();
+        int month = LocalDate.now().getMonthValue();
+        for (int i = 3; i >= 0; i--) {
+            LocalDateTime startDateTime = LocalDate.of(year - i, month, 1).atStartOfDay();
+            LocalDateTime endDateTime = YearMonth.of(year - i, month).atEndOfMonth().atTime(23, 59, 59);
+            results.add(Objects.requireNonNullElse(
+                    userRepository.getCountUserByRoleBetweenDates("CUSTOMER", startDateTime, endDateTime), 0L));
+        }
+        return results;
+    }
+
+    @Override
+    public List<Long> getCountCustomersByMonths() {
+        List<Long> results = new ArrayList<>();
+        LocalDateTime startToday = LocalDate.now().atStartOfDay();
+        LocalDateTime endToday = LocalDate.now().atTime(23, 59, 59);
+        for (int i = 11; i >= 0; i--) {
+            LocalDateTime startDateTime = startToday.minusMonths(i);
+            LocalDateTime endDateTime = endToday.minusMonths(i);
+            results.add(Objects.requireNonNullElse(
+                    userRepository.getCountUserByRoleBetweenDates("CUSTOMER", startDateTime, endDateTime), 0L));
+        }
+        return results;
+    }
+
+    @Override
+    public List<Long> getCountCustomersByDays() {
+        List<Long> results = new ArrayList<>();
+        LocalDateTime startToday = LocalDate.now().atStartOfDay();
+        LocalDateTime endToday = LocalDate.now().atTime(23, 59, 59);
+        for (int i = 6; i >= 0; i--) {
+            LocalDateTime startDateTime = startToday.minusDays(i);
+            LocalDateTime endDateTime = endToday.minusDays(i);
+            results.add(Objects.requireNonNullElse(
+                    userRepository.getCountUserByRoleBetweenDates("CUSTOMER", startDateTime, endDateTime), 0L));
+        }
+        return results;
+    }
+
+    @Override
+    public List<Long> getCountHumanResoucesByYears() {
+        List<Long> results = new ArrayList<>();
+        int year = LocalDate.now().getYear();
+        int month = LocalDate.now().getMonthValue();
+        for (int i = 3; i >= 0; i--) {
+            LocalDateTime startDateTime = LocalDate.of(year - i, month, 1).atStartOfDay();
+            LocalDateTime endDateTime = YearMonth.of(year - i, month).atEndOfMonth().atTime(23, 59, 59);
+            results.add(Objects.requireNonNullElse(
+                    userRepository.getCountUserNotRoleBetweenDates("CUSTOMER", startDateTime, endDateTime), 0L));
+        }
+        return results;
+    }
+
+    @Override
+    public List<Long> getCountHumanResoucesByMonths() {
+        List<Long> results = new ArrayList<>();
+        LocalDateTime startToday = LocalDate.now().atStartOfDay();
+        LocalDateTime endToday = LocalDate.now().atTime(23, 59, 59);
+        for (int i = 11; i >= 0; i--) {
+            LocalDateTime startDateTime = startToday.minusMonths(i);
+            LocalDateTime endDateTime = endToday.minusMonths(i);
+            results.add(Objects.requireNonNullElse(
+                    userRepository.getCountUserNotRoleBetweenDates("CUSTOMER", startDateTime, endDateTime), 0L));
+        }
+        return results;
+    }
+
+    @Override
+    public List<Long> getCountHumanResoucesByDays() {
+        List<Long> results = new ArrayList<>();
+        LocalDateTime startToday = LocalDate.now().atStartOfDay();
+        LocalDateTime endToday = LocalDate.now().atTime(23, 59, 59);
+        for (int i = 6; i >= 0; i--) {
+            LocalDateTime startDateTime = startToday.minusDays(i);
+            LocalDateTime endDateTime = endToday.minusDays(i);
+            results.add(Objects.requireNonNullElse(
+                    userRepository.getCountUserNotRoleBetweenDates("CUSTOMER", startDateTime, endDateTime), 0L));
+        }
+        return results;
     }
 }

@@ -1,5 +1,6 @@
 package com.example.jewelrystore.Controller;
 
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -103,7 +104,65 @@ public class UserController {
             return null; // hoặc ném exception 401
         }
         return userService.getInfor(userDetails.getUsername());
+    }
 
+    // Tổng số khách hàng
+    @GetMapping("/customers/count")
+    public ResponseEntity<Long> getTotalCustomers() {
+        Long total = userService.getCountByRole("CUSTOMER");
+        return ResponseEntity.ok(total);
+    }
+
+    // Tổng số khách hàng theo đơn vị thời gian
+    @GetMapping("/customers/count/unitTime")
+    public ResponseEntity<Long> getTotalCustomers(@RequestParam String time) {
+        Long total = userService.getCountUsersByRoleBetweenDates(time, "CUSTOMER");
+        return ResponseEntity.ok(total);
+    }
+
+    // Tổng số nhân viên (admin, staff, shipper) theo thời gian
+    @GetMapping("/humanResources/count/unitTime")
+    public ResponseEntity<Long> getTotalHumanResources(@RequestParam String time) {
+        Long total = userService.getCountUserNotRoleBetweenDates(time, "CUSTOMER");
+        return ResponseEntity.ok(total);
+    }
+
+    // Đếm tổng số nhân viên hiện tại
+    @GetMapping("/humanResources/count")
+    public Long getCountByNotRole() {
+        return userService.getCountByRoleNot("CUSTOMER");
+    }
+
+    // Danh sách tổng số nhân viên theo 4 năm mới nhất
+    @GetMapping("customers/chart/years")
+    public List<Long> getCountCustomersByYears() {
+        return userService.getCountCustomersByYears();
+    }
+
+    // Danh sách tổng số nhân viên theo 4 năm mới nhất
+    @GetMapping("customers/chart/months")
+    public List<Long> getCountCustomersByMonths() {
+        return userService.getCountCustomersByMonths();
+    }// Danh sách tổng số nhân viên theo 4 năm mới nhất
+
+    @GetMapping("customers/chart/days")
+    public List<Long> getCountCustomersByDays() {
+        return userService.getCountCustomersByDays();
+    }
+
+    @GetMapping("humanresources/chart/years")
+    public List<Long> getCountHumanresourcesByYears() {
+        return userService.getCountHumanResoucesByYears();
+    }
+
+    @GetMapping("humanresources/chart/months")
+    public List<Long> getCountHumanresourcesByMonths() {
+        return userService.getCountHumanResoucesByMonths();
+    }
+
+    @GetMapping("humanresources/chart/days")
+    public List<Long> getCountHumanresourcesByDays() {
+        return userService.getCountHumanResoucesByDays();
     }
 
 }
