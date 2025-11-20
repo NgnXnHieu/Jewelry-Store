@@ -24,6 +24,7 @@ const Cart = () => {
     const API_URL = `http://localhost:8080/api/cart_details/cart_detailsByUserName`;
 
     useEffect(() => {
+        window.scrollTo(0, 0);
         const fetchCart = async () => {
             try {
                 const res = await axiosInstance.get("/cart_details/cart_detailsByUserName");
@@ -264,7 +265,7 @@ const Cart = () => {
                                 </div>
 
                                 <div className={styles.cardImage}>
-                                    <img src={item.image} alt={item.name} />
+                                    <img src={`http://localhost:8080/images/${item.image}`} />
                                     <span className={styles.itemNumber}>{index + 1}</span>
                                 </div>
 

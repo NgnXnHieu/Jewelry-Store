@@ -337,6 +337,22 @@
     transform: translateX(5px);
 }
 
+.notification {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    background: #10b981;
+    color: white;
+    padding: 16px 24px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    box-shadow: 0 8px 30px rgba(16, 185, 129, 0.3);
+    animation: slideInRight 0.3s ease;
+    z-index: 1000;
+}
+
 /* ========== FILTER BAR ========== */
 .filterBar {
     display: flex;

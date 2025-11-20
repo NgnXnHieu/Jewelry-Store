@@ -16,7 +16,7 @@
     justify-content: space-between;
     align-items: center;
     background: linear-gradient(135deg, #7b1d34 0%, #764ba2 100%);
-    padding: 20px 40px;
+    padding: 10px 40px;
     gap: 30px;
     position: relative;
 }
@@ -86,12 +86,13 @@
 }
 
 .searchBar {
+    font-size: 18px;
     flex: 1;
     border: none;
     outline: none;
     background: transparent;
     color: #333;
-    padding: 8px;
+    padding: 0;
 }
 
 .searchBar::placeholder {
@@ -107,6 +108,7 @@
     cursor: pointer;
     transition: all 0.3s ease;
     white-space: nowrap;
+    font-size: 14px;
 }
 
 .searchButton:hover {

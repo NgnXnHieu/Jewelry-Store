@@ -16,6 +16,7 @@ function Category() {
     const navigate = useNavigate();
 
     useEffect(() => {
+        window.scrollTo(0, 0);
         const fetchCategoryName = async () => {
             try {
                 const res = await axiosInstance.get(`categories/${id}`);
@@ -103,10 +104,10 @@ function Category() {
                 <span className={style.breadcrumbItem} onClick={() => navigate("/")}>
                     Trang chủ
                 </span>
-                <span className={style.breadcrumbSeparator}>/</span>
-                <span className={style.breadcrumbItem} onClick={() => navigate("/categories")}>
+                {/* <span className={style.breadcrumbSeparator}>/</span> */}
+                {/* <span className={style.breadcrumbItem} onClick={() => navigate("/categories")}>
                     Danh mục
-                </span>
+                </span> */}
                 <span className={style.breadcrumbSeparator}>/</span>
                 <span className={style.breadcrumbActive}>{categoryName}</span>
             </div>

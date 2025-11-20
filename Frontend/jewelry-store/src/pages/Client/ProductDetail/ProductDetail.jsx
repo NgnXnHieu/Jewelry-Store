@@ -115,7 +115,7 @@ function ProductDetail() {
                     <div className={styles.imageGallery}>
                         <div className={styles.mainImageBox}>
                             <img
-                                src={productImages[selectedImage]}
+                                src={`http://localhost:8080/images/${product.image_url}`}
                                 alt={product.name}
                                 className={styles.mainImage}
                             />
@@ -136,7 +136,8 @@ function ProductDetail() {
                                     className={`${styles.thumbnail} ${selectedImage === index ? styles.activeThumbnail : ""}`}
                                     onClick={() => setSelectedImage(index)}
                                 >
-                                    <img src={img} alt={`${product.name} ${index + 1}`} />
+                                    {/* các ảnh góc khác của sản phẩm */}
+                                    <img src={`http://localhost:8080/images/${product.image_url}`} alt={`${product.name} ${index + 1}`} />
                                 </div>
                             ))}
                         </div>
@@ -324,7 +325,8 @@ function ProductDetail() {
                         {relatedProducts.map((p) => (
                             <div key={p.id} className={styles.relatedCard}>
                                 <div className={styles.relatedImageWrapper}>
-                                    <img src={p.image_url} alt={p.name} />
+                                    <img src={`http://localhost:8080/images/${p.image_url}`} alt={p.name} />
+
                                 </div>
                                 <div className={styles.relatedContent}>
                                     <h3 className={styles.relatedName}>{p.name}</h3>

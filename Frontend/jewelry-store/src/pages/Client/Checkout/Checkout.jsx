@@ -3,18 +3,19 @@ import axiosInstance from "../../../api/axiosInstance";
 import Swal from "sweetalert2";
 import { useLocation } from "react-router-dom";
 import styles from "./Checkout.module.css";
+import { useNavigate } from "react-router-dom";
 
 const Checkout = () => {
     const location = useLocation();
     const { items } = location.state || { items: [] };
 
     console.log("Danh sách sản phẩm mua:", items);
-    // const { items = [] } = location.state || {}; // ✅ Nhận danh sách {id, quantity}
     const [addresses, setAddresses] = useState([]);
     const [selectedAddress, setSelectedAddress] = useState(null);
-    const [orderItems, setOrderItems] = useState([]); // ✅ sản phẩm thực tế
+    const [orderItems, setOrderItems] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const navigate = useNavigate()
 
     // ✅ Lấy thông tin địa chỉ
     useEffect(() => {
@@ -41,16 +42,13 @@ const Checkout = () => {
             if (!items.length) return;
 
             try {
-                // Gọi API song song theo danh sách id
                 const responses = await Promise.all(
                     items.map((it) => {
-                        const productId = it.productId || it.id; // ✅ nếu có productId thì dùng, không thì dùng id
+                        const productId = it.productId || it.id;
                         return axiosInstance.get(`/products/${productId}`);
                     })
-                    // items.map((it) => axiosInstance.get(`/products/${it.productId}`))
                 );
 
-                // Gộp dữ liệu chi tiết + số lượng
                 const detailedItems = responses.map((res, idx) => ({
                     ...res.data,
                     quantity: items[idx].quantity,
@@ -163,10 +161,8 @@ const Checkout = () => {
             return;
         }
 
-        // ✅ Lấy phương thức thanh toán từ radio button
         const paymentMethod = document.querySelector('input[name="paymentMethod"]:checked').value;
 
-        // ✅ Nếu là COD thì xử lý luôn
         if (paymentMethod === "cod") {
             const orderData = {
                 address: `${selectedAddress.village}, ${selectedAddress.ward}, ${selectedAddress.district}`,
@@ -188,7 +184,6 @@ const Checkout = () => {
                 });
 
                 if (result.isConfirmed) {
-                    // ✅ Gửi API tạo đơn hàng
                     const res = await axiosInstance.post("/orders/myOrder", orderData);
 
                     Swal.fire(
@@ -196,82 +191,247 @@ const Checkout = () => {
                         `Đơn hàng đã được tạo thành công!`,
                         "success"
                     );
-
-                    console.log("Đơn hàng mới:", res.data);
-
-                    // ✅ Xóa giỏ hàng tạm nếu có hoặc chuyển hướng
-                    // localStorage.removeItem("cart");
-                    // navigate("/orders");
+                    navigate('/order', { replace: true });
                 }
             } catch (error) {
                 console.error("Lỗi khi tạo đơn hàng:", error);
                 Swal.fire("Thất bại!", "Không thể tạo đơn hàng. Vui lòng thử lại!", "error");
             }
 
-            return; // ✅ Kết thúc luôn, chưa làm các phương thức khác
+            return;
         }
 
-        // ✅ Các phương thức khác (chưa làm)
         Swal.fire("Chưa hỗ trợ!", "Phương thức thanh toán này đang được phát triển.", "info");
     };
 
+    if (loading) {
+        return (
+            <div className={styles.loadingContainer}>
+                <div className={styles.loadingSpinner}></div>
+                <p className={styles.loadingText}>Đang tải thông tin đơn hàng...</p>
+            </div>
+        );
+    }
 
-    if (loading) return <p>Đang tải dữ liệu...</p>;
-    if (error) return <p>Lỗi khi tải dữ liệu!</p>;
-    if (!orderItems.length) return <p>Không có sản phẩm để thanh toán!</p>;
+    if (error) {
+        return (
+            <div className={styles.errorContainer}>
+                <div className={styles.errorIcon}>❌</div>
+                <h3>Lỗi khi tải dữ liệu!</h3>
+                <p>Vui lòng thử lại sau</p>
+            </div>
+        );
+    }
+
+    if (!orderItems.length) {
+        return (
+            <div className={styles.emptyContainer}>
+                <div className={styles.emptyIcon}>🛒</div>
+                <h3>Không có sản phẩm để thanh toán!</h3>
+                <p>Vui lòng thêm sản phẩm vào giỏ hàng</p>
+            </div>
+        );
+    }
 
     return (
         <div className={styles.checkoutContainer}>
-            <h1>Thanh toán</h1>
+            {/* Hero Header */}
+            <div className={styles.heroHeader}>
+                <div className={styles.heroContent}>
+                    <div className={styles.heroIcon}>🛍️</div>
+                    <h1 className={styles.heroTitle}>Thanh toán đơn hàng</h1>
+                    <p className={styles.heroSubtitle}>
+                        Hoàn tất đơn hàng của bạn với {orderItems.length} sản phẩm
+                    </p>
+                </div>
+            </div>
+
+            {/* Checkout Steps */}
+            <div className={styles.stepsContainer}>
+                <div className={`${styles.step} ${styles.stepActive}`}>
+                    <div className={styles.stepNumber}>1</div>
+                    <span>Thông tin giao hàng</span>
+                </div>
+                <div className={styles.stepLine}></div>
+                <div className={`${styles.step} ${styles.stepActive}`}>
+                    <div className={styles.stepNumber}>2</div>
+                    <span>Thanh toán</span>
+                </div>
+                <div className={styles.stepLine}></div>
+                <div className={styles.step}>
+                    <div className={styles.stepNumber}>3</div>
+                    <span>Hoàn thành</span>
+                </div>
+            </div>
+
             <div className={styles.checkoutGrid}>
                 {/* Thông tin người nhận */}
                 <form className={styles.infoSection} onSubmit={handleConfirm}>
-                    <h2>Thông tin giao hàng</h2>
+                    <div className={styles.sectionCard}>
+                        <div className={styles.sectionHeader}>
+                            <h2>📍 Thông tin giao hàng</h2>
+                        </div>
 
-                    <div className={styles.addressBox}>
-                        <p><strong>SĐT:</strong> {selectedAddress?.phone}</p>
-                        <p><strong>Địa chỉ:</strong> {`${selectedAddress?.village}, ${selectedAddress?.ward}, ${selectedAddress?.district}`}</p>
-                        <button type="button" onClick={handleChangeAddress} className={styles.changeButton}>
-                            Thay đổi địa chỉ
-                        </button>
+                        <div className={styles.addressBox}>
+                            <div className={styles.addressHeader}>
+                                <div className={styles.addressIcon}>📦</div>
+                                <div className={styles.addressDetails}>
+                                    <p className={styles.addressLabel}>Số điện thoại</p>
+                                    <p className={styles.addressValue}>{selectedAddress?.phone}</p>
+                                </div>
+                            </div>
+                            <div className={styles.addressHeader}>
+                                <div className={styles.addressIcon}>🏠</div>
+                                <div className={styles.addressDetails}>
+                                    <p className={styles.addressLabel}>Địa chỉ giao hàng</p>
+                                    <p className={styles.addressValue}>
+                                        {`${selectedAddress?.village}, ${selectedAddress?.ward}, ${selectedAddress?.district}`}
+                                    </p>
+                                </div>
+                            </div>
+                            <button
+                                type="button"
+                                onClick={handleChangeAddress}
+                                className={styles.changeButton}
+                            >
+                                🔄 Thay đổi địa chỉ
+                            </button>
+                        </div>
+
+                        <div className={styles.formGroup}>
+                            <label className={styles.formLabel}>
+                                💬 Ghi chú (nếu có):
+                            </label>
+                            <textarea
+                                name="note"
+                                className={styles.formTextarea}
+                                placeholder="Nhập ghi chú cho đơn hàng..."
+                            ></textarea>
+                        </div>
                     </div>
 
-                    <label>
-                        Ghi chú (nếu có):
-                        <textarea name="note"></textarea>
-                    </label>
+                    <div className={styles.sectionCard}>
+                        <div className={styles.sectionHeader}>
+                            <h2>💳 Phương thức thanh toán</h2>
+                        </div>
 
-                    <h3>Phương thức thanh toán</h3>
-                    <div className={styles.paymentMethods}>
-                        <label><input type="radio" name="paymentMethod" value="cod" defaultChecked />Thanh toán khi nhận hàng (COD)</label>
-                        <label><input type="radio" name="paymentMethod" value="bank" />Chuyển khoản ngân hàng</label>
-                        <label><input type="radio" name="paymentMethod" value="vnpay" />Thanh toán qua VNPAY</label>
+                        <div className={styles.paymentMethods}>
+                            <label className={styles.paymentOption}>
+                                <input
+                                    type="radio"
+                                    name="paymentMethod"
+                                    value="cod"
+                                    defaultChecked
+                                />
+                                <div className={styles.paymentContent}>
+                                    <div className={styles.paymentIcon}>💵</div>
+                                    <div className={styles.paymentInfo}>
+                                        <span className={styles.paymentTitle}>Thanh toán khi nhận hàng (COD)</span>
+                                        <span className={styles.paymentDesc}>Thanh toán bằng tiền mặt khi nhận hàng</span>
+                                    </div>
+                                </div>
+                            </label>
+
+                            <label className={styles.paymentOption}>
+                                <input
+                                    type="radio"
+                                    name="paymentMethod"
+                                    value="bank"
+                                />
+                                <div className={styles.paymentContent}>
+                                    <div className={styles.paymentIcon}>🏦</div>
+                                    <div className={styles.paymentInfo}>
+                                        <span className={styles.paymentTitle}>Chuyển khoản ngân hàng</span>
+                                        <span className={styles.paymentDesc}>Chuyển khoản qua tài khoản ngân hàng</span>
+                                    </div>
+                                </div>
+                            </label>
+
+                            <label className={styles.paymentOption}>
+                                <input
+                                    type="radio"
+                                    name="paymentMethod"
+                                    value="vnpay"
+                                />
+                                <div className={styles.paymentContent}>
+                                    <div className={styles.paymentIcon}>💳</div>
+                                    <div className={styles.paymentInfo}>
+                                        <span className={styles.paymentTitle}>Thanh toán qua VNPAY</span>
+                                        <span className={styles.paymentDesc}>Thanh toán qua cổng VNPAY</span>
+                                    </div>
+                                </div>
+                            </label>
+                        </div>
                     </div>
 
                     <button type="submit" className={styles.confirmButton}>
-                        Xác nhận đặt hàng
+                        <span>✓</span> Xác nhận đặt hàng
                     </button>
                 </form>
 
                 {/* Tóm tắt đơn hàng */}
                 <div className={styles.summarySection}>
-                    <h2>Đơn hàng của bạn</h2>
-                    <div className={styles.orderList}>
-                        {orderItems.map((item) => (
-                            <div key={item.id} className={styles.orderItem}>
-                                <img src={item.image_url} alt={item.name} />
-                                <div>
-                                    <p className={styles.name}>{item.name}</p>
-                                    <p>SL: {item.quantity} x {item.price.toLocaleString()}đ</p>
-                                    <p className={styles.subtotal}>{(item.price * item.quantity).toLocaleString()}đ</p>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
+                    <div className={styles.sectionCard}>
+                        <div className={styles.sectionHeader}>
+                            <h2>🛒 Đơn hàng của bạn</h2>
+                            <span className={styles.itemCount}>{orderItems.length} sản phẩm</span>
+                        </div>
 
-                    <div className={styles.totalBox}>
-                        <strong>Tổng cộng:</strong>
-                        <span>{total.toLocaleString()}đ</span>
+                        <div className={styles.orderList}>
+                            {orderItems.map((item) => (
+                                <div key={item.id} className={styles.orderItem}>
+                                    <div className={styles.itemImage}>
+                                        {item.image_url ? (
+                                            <img src={item.image_url} alt={item.name} />
+                                        ) : (
+                                            <div className={styles.noImage}>📦</div>
+                                        )}
+                                        <span className={styles.itemBadge}>{item.quantity}</span>
+                                    </div>
+                                    <div className={styles.itemDetails}>
+                                        <p className={styles.itemName}>{item.name}</p>
+                                        <p className={styles.itemPrice}>
+                                            {item.quantity} x {item.price.toLocaleString()}₫
+                                        </p>
+                                        <p className={styles.itemTotal}>
+                                            {(item.price * item.quantity).toLocaleString()}₫
+                                        </p>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+
+                        <div className={styles.summaryDetails}>
+                            <div className={styles.summaryRow}>
+                                <span>Tạm tính</span>
+                                <span>{total.toLocaleString()}₫</span>
+                            </div>
+                            <div className={styles.summaryRow}>
+                                <span>Phí vận chuyển</span>
+                                <span className={styles.freeShipping}>Miễn phí</span>
+                            </div>
+                            <div className={styles.summaryRow}>
+                                <span>Giảm giá</span>
+                                <span>0₫</span>
+                            </div>
+                        </div>
+
+                        <div className={styles.totalBox}>
+                            <div className={styles.totalLabel}>Tổng cộng</div>
+                            <div className={styles.totalValue}>{total.toLocaleString()}₫</div>
+                        </div>
+
+                        <div className={styles.guaranteeBox}>
+                            <div className={styles.guaranteeItem}>
+                                <span>✓</span> Đảm bảo hoàn tiền
+                            </div>
+                            <div className={styles.guaranteeItem}>
+                                <span>✓</span> Giao hàng nhanh chóng
+                            </div>
+                            <div className={styles.guaranteeItem}>
+                                <span>✓</span> Hỗ trợ 24/7
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>

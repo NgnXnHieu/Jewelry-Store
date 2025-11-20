@@ -181,6 +181,7 @@
 .orderCard:hover {
     box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
     border-color: #667eea;
+    background: #d8e0f0;
 }
 
 .orderHeader {

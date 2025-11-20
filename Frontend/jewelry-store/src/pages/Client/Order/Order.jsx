@@ -49,7 +49,7 @@ export default function Order() {
 
             setOrders(updatedOrders.reverse());
         } catch (error) {
-            console.error("Lỗi khi lấy danh sách đơn hàng:", error);
+            console.error("Lỗi khi lấy danh sách đơn hàng:", error || error.response);
         } finally {
             setLoading(false);
         }
@@ -65,6 +65,7 @@ export default function Order() {
 
     // 🔹 Gọi API khi lần đầu vào hoặc khi đổi trạng thái
     useEffect(() => {
+        window.scrollTo(0, 0);
         debouncedFetchOrders(selectedStatus);
     }, [selectedStatus]);
 
@@ -152,37 +153,40 @@ export default function Order() {
 
                             {/* Products Grid */}
                             <div className={styles.productsGrid}>
-                                {order.orderDetails.map((detail, index) => (
-                                    <div key={detail.id} className={styles.productCard}>
-                                        <div className={styles.productImage}>
-                                            <img
-                                                src={detail.productImage || "https://via.placeholder.com/120"}
-                                                alt={detail.productName || "Sản phẩm"}
-                                            />
-                                            <span className={styles.productIndex}>{index + 1}</span>
-                                        </div>
-                                        <div className={styles.productInfo}>
-                                            <h4 className={styles.productName}>
-                                                {detail.productName || `Sản phẩm #${detail.productId}`}
-                                            </h4>
-                                            <div className={styles.productDetails}>
-                                                <span className={styles.productQuantity}>
-                                                    SL: {detail.quantity}
-                                                </span>
-                                                <span className={styles.productPrice}>
-                                                    {detail.price?.toLocaleString()}₫
-                                                </span>
+                                {order.orderDetails.map((detail, index) => {
+                                    // { console.log(detail) }
+                                    return (
+                                        < div key={detail.id} className={styles.productCard} >
+                                            <div className={styles.productImage}>
+                                                <img
+                                                    src={`http://localhost:8080/images/${detail.productImage}`}
+                                                // alt={detail.productName || "Sản phẩm"}
+                                                />
+                                                <span className={styles.productIndex}>{index + 1}</span>
                                             </div>
-                                            <p className={styles.productTotal}>
-                                                Tổng: <strong>{detail.totalPrice?.toLocaleString()}₫</strong>
-                                            </p>
+                                            <div className={styles.productInfo}>
+                                                <h4 className={styles.productName}>
+                                                    {detail.productName || `Sản phẩm #${detail.productId}`}
+                                                </h4>
+                                                <div className={styles.productDetails}>
+                                                    <span className={styles.productQuantity}>
+                                                        SL: {detail.quantity}
+                                                    </span>
+                                                    <span className={styles.productPrice}>
+                                                        {detail.price?.toLocaleString()}₫
+                                                    </span>
+                                                </div>
+                                                <p className={styles.productTotal}>
+                                                    Tổng: <strong>{detail.totalPrice?.toLocaleString()}₫</strong>
+                                                </p>
+                                            </div>
                                         </div>
-                                    </div>
-                                ))}
+                                    );
+                                })}
                             </div>
 
                             {/* Order Footer */}
-                            <div className={styles.orderFooter}>
+                            < div className={styles.orderFooter} >
                                 <div className={styles.deliveryInfo}>
                                     <div className={styles.infoItem}>
                                         <span className={styles.infoIcon}>📍</span>
@@ -214,8 +218,9 @@ export default function Order() {
                             </div>
                         </div>
                     ))
-                )}
-            </div>
-        </div>
+                )
+                }
+            </div >
+        </div >
     );
 }
