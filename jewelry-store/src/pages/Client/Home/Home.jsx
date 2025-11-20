@@ -2,6 +2,9 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import style from "./Home.module.css";
 import { getAllProducts } from "../../../api/productApi";
+import { addToCart } from "../../../api/cartApi";
+import { FaCheckCircle } from "react-icons/fa";
+
 
 function Home() {
     const products = [
@@ -26,6 +29,8 @@ function Home() {
     const [activeFilter, setActiveFilter] = useState("all");
     const [wishlist, setWishlist] = useState([]);
     const navigate = useNavigate();
+    const [showNotification, setShowNotification] = useState(false);
+
 
     useEffect(() => {
         getAllProducts()
@@ -41,16 +46,16 @@ function Home() {
         navigate(`/bestSeller`);
     };
 
-    const handleAddToCart = (product, e) => {
-        e.stopPropagation();
-        console.log("Thêm vào giỏ:", product);
-        // Show toast notification
-        const toast = document.createElement('div');
-        toast.className = style.toast;
-        toast.textContent = '✓ Đã thêm vào giỏ hàng';
-        document.body.appendChild(toast);
-        setTimeout(() => toast.remove(), 3000);
-    };
+    // const handleAddToCart = (product, e) => {
+    //     e.stopPropagation();
+    //     console.log("Thêm vào giỏ:", product);
+    //     // Show toast notification
+    //     const toast = document.createElement('div');
+    //     toast.className = style.toast;
+    //     toast.textContent = '✓ Đã thêm vào giỏ hàng';
+    //     document.body.appendChild(toast);
+    //     setTimeout(() => toast.remove(), 3000);
+    // };
 
     const toggleWishlist = (productId, e) => {
         e.stopPropagation();
@@ -66,13 +71,32 @@ function Home() {
         // Navigate to category page or filter products
     };
 
+    //Xử lý thêm giỏ hàng
+    const handleAddToCart = async (product, e) => {
+        e.stopPropagation();
+        try {
+            const res = await addToCart(product.id);
+            console.log(`Đã thêm "${product.name}" vào giỏ hàng`, res);
+            setShowNotification(true);
+            setTimeout(() => setShowNotification(false), 3000);
+        } catch (err) {
+            console.error("Lỗi khi thêm vào giỏ:", err);
+            if (err.response?.status === 401) {
+                alert("❌ Bạn cần đăng nhập trước khi thêm vào giỏ!");
+                navigate("/login");
+            } else {
+                alert("❌ Không thể thêm sản phẩm vào giỏ!");
+            }
+        }
+    };
+
     return (
         <div className={style.container}>
             {/* Hero Banner */}
             <section className={style.heroBanner}>
                 <div className={style.heroContent}>
                     <div className={style.heroText}>
-                        <span className={style.heroSubtitle}>✨ Bộ sưu tập mới 2024</span>
+                        <span className={style.heroSubtitle}>✨ Bộ sưu tập mới 2025</span>
                         <h1 className={style.heroTitle}>Vẻ Đẹp Vượt Thời Gian</h1>
                         <p className={style.heroDescription}>
                             Khám phá những thiết kế trang sức sang trọng, tinh tế được chế tác thủ công từ những nghệ nhân tài ba
@@ -185,11 +209,18 @@ function Home() {
                             onClick={() => handleCardClick(product.id)}
                         >
                             <div className={style.cardImageWrapper}>
-                                <img
-                                    src={product.image}
+                                {product.image ? (<img
+                                    src={`http://localhost:8080/images/${product.image_url}`}
                                     alt={product.name}
                                     className={style.image}
-                                />
+                                />) : (
+                                    <div className={style.noImage}>
+                                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                        </svg>
+                                    </div>
+                                )}
+
                                 <div className={style.cardOverlay}>
                                     <button
                                         className={style.quickViewButton}
@@ -255,11 +286,23 @@ function Home() {
                                 onClick={() => handleCardClick(product.id)}
                             >
                                 <div className={style.cardImageWrapper}>
-                                    <img
+                                    {/* <img
                                         src={product.image_url}
                                         alt={product.name}
                                         className={style.image}
-                                    />
+                                    /> */}
+                                    {/* {console.log(product)} */}
+                                    {product.image_url ? (<img
+                                        src={`http://localhost:8080/images/${product.image_url}`}
+                                        alt={product.name}
+                                        className={style.image}
+                                    />) : (
+                                        <div className={style.noImage}>
+                                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                            </svg>
+                                        </div>
+                                    )}
                                     <div className={style.cardOverlay}>
                                         <button
                                             className={style.quickViewButton}
@@ -338,6 +381,13 @@ function Home() {
                     </div>
                 </div>
             </section>
+            {/* Success Notification */}
+            {showNotification && (
+                <div className={style.notification}>
+                    <FaCheckCircle className={style.notificationIcon} />
+                    <span>Đã thêm vào giỏ hàng!</span>
+                </div>
+            )}
         </div>
     );
 }

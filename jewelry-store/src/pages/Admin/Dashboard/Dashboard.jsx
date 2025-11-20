@@ -1,5 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Bar, Line, Doughnut } from "react-chartjs-2";
+import axiosInstance from "../../../api/axiosInstance";
+
 import {
     Chart as ChartJS,
     CategoryScale,
@@ -29,93 +31,264 @@ ChartJS.register(
 function Dashboard() {
     const [activeCategory, setActiveCategory] = useState("revenue");
     const [filterType, setFilterType] = useState("month");
+    const [selectedYear, setSelectedYear] = useState("2024");
+    const [selectedMonth, setSelectedMonth] = useState("1");
+    const [stats, setStats] = useState([]);
+    const [detailStats, setDetailStats] = useState([]);
+    useEffect(() => {
+        fetchStats();
+    }, [filterType, activeCategory]);
+    const fetchStats = async () => {
+        try {
+            let responses;
+            responses = await Promise.all([
+                axiosInstance.get(`http://localhost:8080/api/orders/sumByUnitTime?time=${filterType}`),
+                axiosInstance.get(`http://localhost:8080/api/orders/quantity/count/unitTime?time=${filterType}`),
+                axiosInstance.get(`http://localhost:8080/api/users/customers/count`),
+                axiosInstance.get(`http://localhost:8080/api/users/humanResources/count`),
+                axiosInstance.get("http://localhost:8080/api/products/count"),
+                axiosInstance.get("http://localhost:8080/api/categories/count")
+            ]);
 
-    // Mock data for statistics
-    const stats = [
-        { id: "revenue", title: "Doanh thu", value: "92,400,000₫", icon: "💰", color: "#4CAF50" },
-        { id: "orders", title: "Đơn hàng", value: 1284, icon: "📦", color: "#2196F3" },
-        { id: "users", title: "Người dùng", value: 4567, icon: "👥", color: "#9C27B0" },
-        { id: "products", title: "Sản phẩm", value: 589, icon: "🛍️", color: "#FF9800" },
-        { id: "categories", title: "Danh mục", value: 24, icon: "📂", color: "#00BCD4" },
-        { id: "employees", title: "Nhân viên", value: 45, icon: "👨‍💼", color: "#F44336" },
-    ];
+            // Gán từng biến từ mảng responses
+            const [revenueRes, ordersRes, customersRes, staffRes, productsRes, categoriesRes] = responses;
 
-    // Mock data based on filter type
-    const getLabels = () => {
-        if (filterType === "year") {
-            return ["2019", "2020", "2021", "2022", "2023", "2024"];
-        } else if (filterType === "month") {
-            return ["Tháng 1", "Tháng 2", "Tháng 3", "Tháng 4", "Tháng 5", "Tháng 6", "Tháng 7", "Tháng 8", "Tháng 9", "Tháng 10", "Tháng 11", "Tháng 12"];
-        } else {
-            return ["CN", "T2", "T3", "T4", "T5", "T6", "T7"];
+            // Tạo formattedStats
+            const formattedStats = [
+                { id: "revenue", title: "Doanh thu", value: revenueRes.data.toLocaleString("vi-VN") + "₫", icon: "💰", color: "#4CAF50" },
+                { id: "orders", title: "Đơn hàng", value: ordersRes.data, icon: "📦", color: "#2196F3" },
+                { id: "customers", title: "Khách hàng", value: customersRes.data, icon: "👥", color: "#9C27B0" },
+                { id: "staffs", title: "Nhân viên", value: staffRes.data, icon: "👨‍💼", color: "#F44336" },
+                { id: "products", title: "Sản phẩm", value: productsRes.data, icon: "🛍️", color: "#FF9800" },
+                { id: "categories", title: "Danh mục", value: categoriesRes.data, icon: "📂", color: "#00BCD4" },
+            ];
+            //Tại đây setStats chỉ mới được đánh dấu chứ chưa được set vì thread chưa rảnh
+            setStats(formattedStats);
+
+        } catch (error) {
+            console.error("Lỗi khi lấy dữ liệu:", error);
         }
     };
 
-    const getData = () => {
+    const fetchDetails = async () => {
+        let statsArray = []
         switch (activeCategory) {
             case "revenue":
-                if (filterType === "year") {
-                    return [450000000, 520000000, 680000000, 750000000, 820000000, 924000000];
-                } else if (filterType === "month") {
-                    return [65000000, 72000000, 68000000, 85000000, 92000000, 78000000, 88000000, 95000000, 82000000, 90000000, 98000000, 105000000];
-                } else {
-                    return [2800000, 3200000, 2900000, 3500000, 3800000, 4200000, 3600000];
-                }
+                let [revenuePerDay, maxPriceOfOdersByTimeUnit] = await Promise.all([
+                    axiosInstance.get(`/orders/revenuePerDay?time=${filterType}`),
+                    axiosInstance.get(`/orders/maxPriceOfOdersByTimeUnit?time=${filterType}`)
+                ]);
+                statsArray = [
+                    { label: "Tổng doanh thu", value: stats[0]?.value ?? "..." },
+                    { label: "Doanh thu trung bình/ngày", value: revenuePerDay?.data.toLocaleString("vi-VN") + "đ" ?? "..." },
+                    // { label: "Tăng trưởng", value: "+12.5%" },   
+                    { label: "Đơn hàng cao nhất", value: maxPriceOfOdersByTimeUnit?.data.toLocaleString("vi-VN") + "đ" ?? "..." },
+                ];
+                setDetailStats(statsArray);
+                break;
             case "orders":
-                if (filterType === "year") {
-                    return [5200, 6800, 8400, 9600, 11200, 12840];
-                } else if (filterType === "month") {
-                    return [850, 920, 880, 1050, 1120, 980, 1080, 1150, 1020, 1100, 1180, 1250];
-                } else {
-                    return [35, 42, 38, 45, 48, 52, 44];
-                }
-            case "users":
-                if (filterType === "year") {
-                    return [1200, 1850, 2400, 3100, 3800, 4567];
-                } else if (filterType === "month") {
-                    return [320, 350, 340, 380, 420, 390, 430, 460, 410, 440, 480, 520];
-                } else {
-                    return [15, 18, 16, 22, 25, 28, 24];
-                }
+                let [ordersPerDay, unresolvedOrder, resolvedOrder] = await
+                    Promise.all([
+                        axiosInstance.get(`orders/perDay/count/unitTime?time=${filterType}`),
+                        axiosInstance.get(`orders/resolved/count/unitTime?time=${filterType}`),
+                        axiosInstance.get(`orders/unresolved/count/unitTime?time=${filterType}`)
+                    ]);
+
+                statsArray = [
+                    { label: "Tổng đơn hàng", value: stats[1]?.value ?? "..." },
+                    { label: "Đơn hàng/ngày", value: ordersPerDay?.data.toLocaleString("vi-VN") ?? "..." },
+                    { label: "Đang xử lý", value: unresolvedOrder?.data ?? "..." },
+                    { label: "Giao thành công", value: resolvedOrder?.data ?? "..." },
+                ];
+                setDetailStats(statsArray);
+                break;
+            case "customers":
+                let newCustomers = await axiosInstance.get(`/users/customers/count/unitTime?time=${filterType}`)
+                statsArray = [
+                    { label: "Tổng người dùng", value: stats[2]?.value ?? "..." },
+                    { label: `Người dùng mới/${filterType === "year" ? "năm" : (filterType === "month" ? "tháng" : "ngày")}`, value: newCustomers?.data ?? "..." },
+                    // { label: "Đang hoạt động", value: "2,834" },
+                    // { label: "Tỷ lệ giữ chân", value: "68.5%" },
+                ];
+                setDetailStats(statsArray);
+                break;
             case "products":
-                if (filterType === "year") {
-                    return [120, 185, 265, 350, 450, 589];
-                } else if (filterType === "month") {
-                    return [45, 48, 46, 52, 56, 51, 58, 62, 54, 59, 64, 68];
-                } else {
-                    return [2, 3, 1, 4, 3, 5, 2];
-                }
+                let [countInProducts, countOutProducts, bestSeller] = await
+                    Promise.all([
+                        axiosInstance.get(`products/inProducts/count`),
+                        axiosInstance.get(`products/outProducts/count`),
+                        axiosInstance.get(`products/oneBestSeller?time=${filterType}`)
+                    ]);
+                // let formattedBestSeller =bestSeller?.data ?? "..."
+                // console.log(bestSeller)
+                statsArray = [
+                    { label: "Tổng sản phẩm", value: stats[4]?.value ?? "..." },
+                    { label: "Sản phẩm còn hàng", value: countInProducts?.data ?? "..." },
+                    { label: "Sản phẩm đang hết hàng", value: countOutProducts?.data ?? "..." },
+                    {
+                        label: `Sản phẩm được mua nhiều nhất ${filterType === "year" ? "năm" : (filterType === "month" ? "tháng" : "ngày")} `, value: (
+                            <>
+                                #{bestSeller?.data.producId ?? "..."}: {bestSeller?.data.productName ?? "..."}<br />
+                                Lượt bán: {bestSeller?.data.sellQuantity ?? "..."}
+                            </>
+                        )
+                    },
+                ];
+                setDetailStats(statsArray);
+                break;
+
             case "categories":
-                if (filterType === "year") {
-                    return [8, 12, 15, 18, 21, 24];
-                } else if (filterType === "month") {
-                    return [20, 20, 21, 21, 22, 22, 22, 23, 23, 23, 24, 24];
-                } else {
-                    return [0, 0, 1, 0, 0, 0, 0];
-                }
-            case "employees":
-                if (filterType === "year") {
-                    return [15, 22, 28, 33, 39, 45];
-                } else if (filterType === "month") {
-                    return [40, 41, 41, 42, 42, 43, 43, 43, 44, 44, 45, 45];
-                } else {
-                    return [0, 0, 0, 1, 0, 0, 0];
-                }
+                const responses = await axiosInstance.get(`products/TopAndBotSellingCategories?time=${filterType} `)
+                const { minCategory, maxCategory } = (responses.data)
+                // console.log(responses)
+                // console.log(minCategory)
+                // console.log(maxCategory)
+                statsArray = [
+                    { label: "Tổng danh mục", value: stats[5]?.value ?? "..." },
+                    { label: `Danh mục bán nhiều nhất ${filterType === "year" ? "năm" : (filterType === "month" ? "tháng" : "ngày")} `, value: <>#{maxCategory.categoryId}: {maxCategory.categoryName}<br />Lượt bán: {maxCategory.quantity}</> },
+                    { label: `Danh mục bán ít nhất ${filterType === "year" ? "năm" : (filterType === "month" ? "tháng" : "ngày")} `, value: (<>#{minCategory.categoryId}: {minCategory.categoryName}<br />Lượt bán: {minCategory.quantity}</>) },
+                ];
+                setDetailStats(statsArray);
+                break;
+
+            case "staffs":
+                // let [countStaffs, newStaffsByUnitTime] = await
+                //     Promise.all([
+                //         axiosInstance.get(`users / staffs / count`),
+                //         axiosInstance.get(`users / staffs / count / unitTime ? time = ${ filterType } `),
+                //     ]);
+                let newStaffsByUnitTime = await axiosInstance.get(`users/humanResources/count/unitTime?time=${filterType} `);
+                statsArray = [
+                    { label: "Tổng nhân viên", value: stats[3]?.value ?? "..." },
+                    { label: `Nhân viên mới trong ${filterType === "year" ? "năm" : (filterType === "month" ? "tháng" : "ngày")} `, value: newStaffsByUnitTime?.data ?? "..." },
+                ];
+                setDetailStats(statsArray);
+                break;
+
             default:
                 return [];
         }
+    }
+
+    useEffect(() => {
+        fetchDetails();
+    }, [activeCategory, filterType, stats[0]])
+
+
+
+    // Tạo các mốc thời gian
+    const getLabels = () => {
+        if (filterType === "year") {
+            let d = new Date().getFullYear()
+            let years = []
+            for (let i = 0; i < 4; i++) {
+                years[i] = d - 3 + i;
+            }
+            return years;
+        } else if (filterType === "month") {
+            let month = []
+            let today = new Date();
+            for (let i = 0; i < 12; i++) {
+                let newDay = new Date(today);
+                newDay.setMonth(newDay.getMonth() - i);
+                month[11 - i] = newDay.getMonth() + 1;
+            }
+            return month;
+        } else {
+            let days = [];
+            let today = new Date();
+            for (let i = 0; i < 7; i++) {
+                let newDay = new Date(today)
+                newDay.setDate(newDay.getDate() - i);
+                days[6 - i] = newDay.getDate();
+            }
+            return days;
+        }
     };
 
-    const getChartData = () => {
-        const activeColor = stats.find(s => s.id === activeCategory)?.color || "#4CAF50";
+    const [chartData, setChartData] = useState([])
+    //Dữ liệu của biểu đồ cột
+    useEffect(() => {
+        const getData = async () => {
+            switch (activeCategory) {
+                case "revenue":
+                    if (filterType === "year") {
+                        let responses = await axiosInstance.get(`orders/sumTotalPricesByYears`)
+                        setChartData(responses.data)
+                    } else if (filterType === "month") {
+                        let responses = await axiosInstance.get(`orders/sumTotalPricesByMonths`)
+                        setChartData(responses.data)
+                    } else {
+                        let responses = await axiosInstance.get(`orders/sumTotalPricesByDays`)
+                        setChartData(responses.data)
+                    }
+                    break;
+                case "orders":
+                    if (filterType === "year") {
+                        let responses = await axiosInstance.get(`orders/countOrdersByYears`)
+                        setChartData(responses.data)
+                    } else if (filterType === "month") {
+                        let responses = await axiosInstance.get(`orders/countOrdersByMonths`)
+                        setChartData(responses.data)
+                    } else {
+                        let responses = await axiosInstance.get(`orders/countOrdersByDays`)
+                        setChartData(responses.data)
+                    }
+                    break;
+                case "customers":
+                    if (filterType === "year") {
+                        let responses = await axiosInstance.get(`users/customers/chart/years`)
+                        setChartData(responses.data)
+                    } else if (filterType === "month") {
+                        let responses = await axiosInstance.get(`users/customers/chart/months`)
+                        setChartData(responses.data)
+                    } else {
+                        let responses = await axiosInstance.get(`users/customers/chart/days`)
+                        setChartData(responses.data)
+                    }
+                    break;
+                case "products":
 
+                    break;
+                case "categories":
+                    if (filterType === "year") {
+                        return [8, 12, 15, 18, 21, 24];
+                    } else if (filterType === "month") {
+                        return [20, 20, 21, 21, 22, 22, 22, 23, 23, 23, 24, 24];
+                    } else {
+                        return [0, 0, 1, 0, 0, 0, 0];
+                    }
+                    break;
+                case "staffs":
+                    if (filterType === "year") {
+                        let responses = await axiosInstance.get(`users/humanresources/chart/years`)
+                        setChartData(responses.data)
+                    } else if (filterType === "month") {
+                        let responses = await axiosInstance.get(`users/humanresources/chart/months`)
+                        setChartData(responses.data)
+                    } else {
+                        let responses = await axiosInstance.get(`users/humanresources/chart/days`)
+                        setChartData(responses.data)
+                    }
+                    break;
+                default:
+                    return [];
+            }
+        };
+        getData()
+    }, [filterType, activeCategory])
+
+    //Tạo biểu đồ
+    const getChartData = () => {
+        //Lấy ra của mục đang được chọn
+        const activeColor = stats.find(s => s.id === activeCategory)?.color || "#4CAF50";
         return {
             labels: getLabels(),
             datasets: [
                 {
                     label: getCategoryLabel(),
-                    data: getData(),
-                    backgroundColor: activeColor + "99",
+                    data: chartData,
+                    backgroundColor: activeColor + "60",//Tăng độ trong suốt của cột
                     borderColor: activeColor,
                     borderWidth: 2,
                     borderRadius: 6,
@@ -125,18 +298,20 @@ function Dashboard() {
         };
     };
 
+    //Lấy ra lable theo từng mục
     const getCategoryLabel = () => {
         const labels = {
             revenue: "Doanh thu (VNĐ)",
             orders: "Số đơn hàng",
-            users: "Số người dùng",
+            customers: "Số người dùng",
             products: "Số sản phẩm",
             categories: "Số danh mục",
-            employees: "Số nhân viên",
+            staffs: "Số nhân viên",
         };
         return labels[activeCategory];
     };
 
+    //Xử lý tiêu đề trong biểu đồ
     const chartOptions = {
         responsive: true,
         maintainAspectRatio: false,
@@ -145,7 +320,7 @@ function Dashboard() {
             title: {
                 display: true,
                 text: `Thống kê ${getCategoryLabel().toLowerCase()} - ${filterType === "year" ? "Theo năm" : filterType === "month" ? "Theo tháng" : "Theo ngày trong tuần"
-                    }`,
+                    } `,
                 font: { size: 16 }
             },
         },
@@ -154,56 +329,6 @@ function Dashboard() {
                 beginAtZero: true,
             },
         },
-    };
-
-    // Additional detail stats based on active category
-    const getDetailStats = () => {
-        switch (activeCategory) {
-            case "revenue":
-                return [
-                    { label: "Tổng doanh thu", value: "924,000,000₫" },
-                    { label: "Doanh thu trung bình/ngày", value: "3,068,000₫" },
-                    { label: "Tăng trưởng", value: "+12.5%" },
-                    { label: "Đơn hàng cao nhất", value: "5,800,000₫" },
-                ];
-            case "orders":
-                return [
-                    { label: "Tổng đơn hàng", value: "1,284" },
-                    { label: "Đơn hàng/ngày", value: "42" },
-                    { label: "Đang xử lý", value: "156" },
-                    { label: "Đã hoàn thành", value: "1,128" },
-                ];
-            case "users":
-                return [
-                    { label: "Tổng người dùng", value: "4,567" },
-                    { label: "Người dùng mới/tháng", value: "325" },
-                    { label: "Đang hoạt động", value: "2,834" },
-                    { label: "Tỷ lệ giữ chân", value: "68.5%" },
-                ];
-            case "products":
-                return [
-                    { label: "Tổng sản phẩm", value: "589" },
-                    { label: "Còn hàng", value: "542" },
-                    { label: "Hết hàng", value: "47" },
-                    { label: "Sản phẩm mới/tháng", value: "12" },
-                ];
-            case "categories":
-                return [
-                    { label: "Tổng danh mục", value: "24" },
-                    { label: "Đang hoạt động", value: "22" },
-                    { label: "Danh mục phổ biến nhất", value: "Điện tử" },
-                    { label: "Sản phẩm/danh mục", value: "~24.5" },
-                ];
-            case "employees":
-                return [
-                    { label: "Tổng nhân viên", value: "45" },
-                    { label: "Toàn thời gian", value: "38" },
-                    { label: "Bán thời gian", value: "7" },
-                    { label: "Nhân viên mới/tháng", value: "2" },
-                ];
-            default:
-                return [];
-        }
     };
 
     // Category distribution chart (for some categories)
@@ -235,7 +360,7 @@ function Dashboard() {
                     },
                 ],
             };
-        } else if (activeCategory === "employees") {
+        } else if (activeCategory === "staffs") {
             return {
                 labels: ["Nhân viên", "Quản lý", "Giao hàng"],
                 datasets: [
@@ -248,7 +373,7 @@ function Dashboard() {
         }
         return null;
     };
-
+    //Xử lý tiêu đề của biểu đồ tròn
     const doughnutOptions = {
         responsive: true,
         maintainAspectRatio: false,
@@ -268,7 +393,7 @@ function Dashboard() {
 
     // Check if we should show two charts
     const hasDistributionChart = () => {
-        return activeCategory === "categories" || activeCategory === "orders" || activeCategory === "employees";
+        return activeCategory === "categories" || activeCategory === "orders" || activeCategory === "staffs";
     };
 
     return (
@@ -279,19 +404,19 @@ function Dashboard() {
                 {/* Filter Bar */}
                 <div className={styles.filterBar}>
                     <button
-                        className={`${styles.filterBtn} ${filterType === "year" ? styles.active : ""}`}
+                        className={`${styles.filterBtn} ${filterType === "year" ? styles.active : ""} `}
                         onClick={() => setFilterType("year")}
                     >
                         Năm
                     </button>
                     <button
-                        className={`${styles.filterBtn} ${filterType === "month" ? styles.active : ""}`}
+                        className={`${styles.filterBtn} ${filterType === "month" ? styles.active : ""} `}
                         onClick={() => setFilterType("month")}
                     >
                         Tháng
                     </button>
                     <button
-                        className={`${styles.filterBtn} ${filterType === "day" ? styles.active : ""}`}
+                        className={`${styles.filterBtn} ${filterType === "day" ? styles.active : ""} `}
                         onClick={() => setFilterType("day")}
                     >
                         Ngày
@@ -299,12 +424,15 @@ function Dashboard() {
                 </div>
             </div>
 
+
+
+            {/* Xử lý hiển thị cho từng blocks tổng quan */}
             {/* Stats Grid - Clickable Cards */}
             <div className={styles.statsGrid}>
                 {stats.map((stat) => (
                     <div
                         key={stat.id}
-                        className={`${styles.statCard} ${activeCategory === stat.id ? styles.activeCard : ""}`}
+                        className={`${styles.statCard} ${activeCategory === stat.id ? styles.activeCard : ""} `}
                         onClick={() => setActiveCategory(stat.id)}
                         style={{ borderColor: activeCategory === stat.id ? stat.color : "transparent" }}
                     >
@@ -319,9 +447,10 @@ function Dashboard() {
                 ))}
             </div>
 
+            {/* Xử lý các blocks con bên trong */}
             {/* Detail Statistics */}
             <div className={styles.detailStatsGrid}>
-                {getDetailStats().map((detail, index) => (
+                {detailStats.map((detail, index) => (
                     <div key={index} className={styles.detailCard}>
                         <span className={styles.detailLabel}>{detail.label}</span>
                         <span className={styles.detailValue}>{detail.value}</span>
@@ -333,7 +462,7 @@ function Dashboard() {
             <div className={hasDistributionChart() ? styles.chartsContainer : styles.chartsContainerFull}>
                 {/* Main Chart */}
                 <div className={styles.chartBox}>
-                    {activeCategory === "revenue" || activeCategory === "users" ? (
+                    {activeCategory === "revenue" || activeCategory === "customers" ? (
                         <Line data={getChartData()} options={chartOptions} />
                     ) : (
                         <Bar data={getChartData()} options={chartOptions} />
@@ -348,54 +477,7 @@ function Dashboard() {
                 )}
             </div>
 
-            {/* Recent Activity Table
-            <div className={styles.activitySection}>
-                <h2 className={styles.sectionTitle}>Hoạt động gần đây</h2>
-                <div className={styles.activityTable}>
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Thời gian</th>
-                                <th>Loại</th>
-                                <th>Mô tả</th>
-                                <th>Trạng thái</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>10:30 AM</td>
-                                <td>Đơn hàng</td>
-                                <td>Đơn hàng #DH-2024-1284 đã được tạo</td>
-                                <td><span className={styles.statusNew}>Mới</span></td>
-                            </tr>
-                            <tr>
-                                <td>09:45 AM</td>
-                                <td>Người dùng</td>
-                                <td>Người dùng mới đăng ký: nguyenvana@email.com</td>
-                                <td><span className={styles.statusSuccess}>Thành công</span></td>
-                            </tr>
-                            <tr>
-                                <td>09:20 AM</td>
-                                <td>Sản phẩm</td>
-                                <td>Sản phẩm "iPhone 15 Pro" đã được cập nhật</td>
-                                <td><span className={styles.statusSuccess}>Thành công</span></td>
-                            </tr>
-                            <tr>
-                                <td>08:55 AM</td>
-                                <td>Đơn hàng</td>
-                                <td>Đơn hàng #DH-2024-1283 đã được giao</td>
-                                <td><span className={styles.statusDelivered}>Đã giao</span></td>
-                            </tr>
-                            <tr>
-                                <td>08:30 AM</td>
-                                <td>Nhân viên</td>
-                                <td>Nhân viên Trần Thị B đã check-in</td>
-                                <td><span className={styles.statusSuccess}>Thành công</span></td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div> */}
+
         </div>
     );
 }
