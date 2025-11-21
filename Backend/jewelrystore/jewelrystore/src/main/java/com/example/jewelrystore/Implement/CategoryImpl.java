@@ -1,5 +1,7 @@
 package com.example.jewelrystore.Implement;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -52,6 +54,16 @@ public class CategoryImpl implements CategoryService {
     @Override
     public void deleteCategory(Integer id) {
         categoryRepository.deleteById(id);
+    }
+
+    @Override
+    public List<CategoryDTO> getAllNoPage() {
+        return categoryRepository.findAll().stream().map(categoryMapper::toCategoryDTO).toList();
+    }
+
+    @Override
+    public Long getCountCategory() {
+        return categoryRepository.countAllCategory();
     }
 
 }

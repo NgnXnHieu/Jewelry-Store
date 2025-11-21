@@ -50,7 +50,7 @@ public class AuthController {
 
     @PostMapping("api/register")
     public ResponseEntity<?> register(@RequestBody @Valid RegisterForm form) {
-        userService.create(form);
+        userService.register(form);
         return ResponseEntity.ok("Register Successfull");
     }
 
@@ -60,9 +60,9 @@ public class AuthController {
     // }
 
     @PostMapping("api/login")
-    public String login(@RequestBody LoginForm form, HttpServletResponse response) {
-        authService.login(form, response);
-        return "Login succesfull";
+    public ResponseEntity<?> login(@RequestBody LoginForm form, HttpServletResponse response) {
+        return authService.login(form, response);
+        // return "Login succesfull";
     }
 
     // @PostMapping("api/refreshToken")

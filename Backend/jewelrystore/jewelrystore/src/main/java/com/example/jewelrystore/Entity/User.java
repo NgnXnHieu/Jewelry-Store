@@ -23,6 +23,8 @@ public class User {
     private String role;
     private String full_name;
     private String phone;
+    private boolean is_active;
+    private String image_url;
     @Column(name = "created_at", updatable = false)
     @CreationTimestamp
     private LocalDateTime created_at;
@@ -31,7 +33,7 @@ public class User {
     }
 
     public User(Integer id, String username, String email, String password, String role, String full_name,
-            String phone) {
+            String phone, boolean is_active, String image_url) {
         this.id = id;
         this.username = username;
         this.email = email;
@@ -39,6 +41,16 @@ public class User {
         this.role = role;
         this.full_name = full_name;
         this.phone = phone;
+        this.is_active = is_active;
+        this.image_url = image_url;
+    }
+
+    public String getImage_url() {
+        return image_url;
+    }
+
+    public void setImage_url(String image_url) {
+        this.image_url = image_url;
     }
 
     public Integer getId() {
@@ -99,6 +111,14 @@ public class User {
 
     public LocalDateTime getCreated_at() {
         return created_at;
+    }
+
+    public boolean isIs_active() {
+        return is_active;
+    }
+
+    public void setIs_active(boolean is_active) {
+        this.is_active = is_active;
     }
 
     @Override

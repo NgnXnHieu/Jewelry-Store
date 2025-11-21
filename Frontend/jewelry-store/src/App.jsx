@@ -16,6 +16,10 @@ import BestSeller from "./pages/Client/BestSeller/BestSeller.jsx";
 import AdminLayout from "./Layout/AdminLayout.jsx";
 import Dashboard from "./pages/Admin/Dashboard/Dashboard.jsx";
 import ProductManagement from "./pages/Admin/ProductManagement/ProductManagement.jsx";
+import CategoryManagement from "./pages/Admin/CategoryManagement/CategoryManagement.jsx";
+import OrderManagement from "./pages/Admin/OrderManagement/OrderManagement.jsx";
+import HumanResourcesManagement from "./pages/Admin/HumanResourcesManagement/HumanResourcesManagement.jsx";
+import Inventory from "./pages/Admin/Inventory/Inventory.jsx";
 function App() {
   return (
     <BrowserRouter>
@@ -43,6 +47,10 @@ function App() {
         <Route path="/admin" element={<AdminLayout />}>
           <Route index element={<Dashboard />} />
           <Route path="productManagement" element={< ProductManagement />} />
+          <Route path="categoryManagement" element={< CategoryManagement />} />
+          <Route path="orders" element={< OrderManagement />} />
+          <Route path="humanResourcesManagement" element={< HumanResourcesManagement />} />
+          <Route path="inventory" element={< Inventory />} />
         </Route>
       </Routes>
     </BrowserRouter>

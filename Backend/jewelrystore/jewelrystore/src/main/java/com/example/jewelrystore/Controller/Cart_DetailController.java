@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -81,7 +82,11 @@ public class Cart_DetailController {
     @GetMapping("cart_detailsByUserName")
     public Page<Cart_DetailDTO> getCart_DetailsByUserId(@AuthenticationPrincipal UserDetails userDetails,
             Pageable pageable) {
+        // 🔹 Cách 2: in ra authentication thực tế khi controller được gọi
+        var auth = SecurityContextHolder.getContext().getAuthentication();
+        System.out.println("Authentication at controller = " + auth);
         if (userDetails == null) {
+            // System.out.println("Hello");
             return null; // hoặc ném exception 401
         }
         return cart_DetailService.getCart_DetailsByUserName(userDetails.getUsername(), pageable);

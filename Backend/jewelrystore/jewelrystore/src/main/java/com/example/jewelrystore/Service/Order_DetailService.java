@@ -14,6 +14,8 @@ public interface Order_DetailService {
 
     Order_DetailDTO updateOrder_Detail(Integer id, Order_DetailUpdateForm updateForm);
 
+    List<Order_DetailDTO> getOrder_DetailsByOrderId(Integer orderId);
+
     Page<Order_DetailDTO> getAllOrder_Detail(Pageable pageable);
 
     Order_DetailDTO getOrder_DetailById(Integer id);

@@ -61,4 +61,11 @@ public class Order_DetailImpl implements Order_DetailService {
         order_DetailRepository.deleteById(id);
     }
 
+    @Override
+    public List<Order_DetailDTO> getOrder_DetailsByOrderId(Integer orderId) {
+        return order_DetailRepository.findByOrderId(orderId).stream()
+                .map(order_DetailMapper::toOrder_DetailDTO)
+                .toList();
+    }
+
 }

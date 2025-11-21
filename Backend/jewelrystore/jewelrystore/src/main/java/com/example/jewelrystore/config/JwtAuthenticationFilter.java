@@ -85,11 +85,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             HttpServletResponse response,
             FilterChain filterChain)
             throws ServletException, IOException {
+        System.out.println("Authentication before filter = "
+                + SecurityContextHolder.getContext().getAuthentication());
 
         String path = request.getServletPath();
 
         // ✅ Bỏ qua filter cho các URL public (login, register, refreshToken)
-        if (path.equals("/api/login") || path.equals("/api/register") || path.equals("/api/refreshToken")) {
+        if (path.equals("/api/login") || path.equals("/api/register") || path.equals("/api/refreshToken")
+                || path.startsWith("/api/webhook")) {
             filterChain.doFilter(request, response);
             return;
         }
@@ -135,6 +138,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         // System.out.println("Username: " + username);
 
         filterChain.doFilter(request, response);
+        System.out.println("Authentication before filter = "
+                + SecurityContextHolder.getContext().getAuthentication());
     }
 
     // ✅ Hàm lấy token từ cookie

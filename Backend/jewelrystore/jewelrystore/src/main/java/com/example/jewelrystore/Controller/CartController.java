@@ -40,8 +40,8 @@ public class CartController {
     }
 
     @PostMapping
-    public ResponseEntity create(@RequestBody @Valid CartCreateForm addressCreateForm) {
-        CartDTO created = service.createCart(addressCreateForm);
+    public ResponseEntity create(@RequestBody @Valid CartCreateForm cartCreateForm) {
+        CartDTO created = service.createCart(cartCreateForm);
         return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
 

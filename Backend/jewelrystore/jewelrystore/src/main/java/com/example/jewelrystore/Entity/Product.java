@@ -2,6 +2,7 @@ package com.example.jewelrystore.Entity;
 
 import java.util.List;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -40,8 +41,10 @@ public class Product {
     @ManyToOne
     @JoinColumn(name = "category_id")
     private Category category;
-    @OneToMany(mappedBy = "product")
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
     private List<Order_Detail> orderDetails;
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
+    private List<Inventory_History> inventory_Histories;
 
     @Override
     public String toString() {

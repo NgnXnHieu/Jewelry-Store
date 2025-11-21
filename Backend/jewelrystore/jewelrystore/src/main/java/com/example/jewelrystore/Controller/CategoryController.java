@@ -1,5 +1,7 @@
 package com.example.jewelrystore.Controller;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -21,6 +23,7 @@ import com.example.jewelrystore.Form.CategoryForm.CategoryUpdateForm;
 import com.example.jewelrystore.Service.CategoryService;
 
 import jakarta.validation.Valid;
+import org.springframework.web.bind.annotation.RequestParam;
 
 @RestController
 @RequestMapping("/api/categories")
@@ -32,6 +35,12 @@ public class CategoryController {
     @GetMapping
     public Page<CategoryDTO> getAll(Pageable pageable) {
         return service.getAllCategory(pageable);
+    }
+
+    // Lấy tất cả mà không phân trang
+    @GetMapping("/all")
+    public List<CategoryDTO> getAllNoPage() {
+        return service.getAllNoPage();
     }
 
     @GetMapping("/{id}")
@@ -55,6 +64,12 @@ public class CategoryController {
     public String delete(@PathVariable Integer id) {
         service.deleteCategory(id);
         return "Xóa thành công";
+    }
+
+    @GetMapping("/count")
+    public ResponseEntity<Long> getTotalCategoriesQuantity() {
+        Long total = service.getCountCategory();
+        return ResponseEntity.ok(total);
     }
 
 }

@@ -8,7 +8,7 @@ import com.example.jewelrystore.Form.Invetory_HistoryForm.Inventory_HistoryCreat
 import com.example.jewelrystore.Form.Invetory_HistoryForm.Invetory_HistoryUpdateForm;
 
 public interface Inventory_HistoryService {
-    Inventory_HistoryDTO createInventory_History(Inventory_HistoryCreateForm createForm);
+    Inventory_HistoryDTO createInventory_History(Inventory_HistoryCreateForm createForm, String username);
 
     Inventory_HistoryDTO updateInventory_History(Integer id, Invetory_HistoryUpdateForm updateForm);
 

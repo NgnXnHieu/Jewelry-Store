@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.jewelrystore.DTO.OrderDTO;
-import com.example.jewelrystore.Entity.Order;
+import com.example.jewelrystore.DTO.OrderSumaryDTO;
 import com.example.jewelrystore.Form.OrderForm.OrderCreateForm;
 import com.example.jewelrystore.Form.OrderForm.OrderUpdateForm;
 import com.example.jewelrystore.Service.OrderService;
@@ -38,6 +38,11 @@ public class OrderController {
     @GetMapping
     public Page<OrderDTO> getAll(Pageable pageable) {
         return service.getAllOrder(pageable);
+    }
+
+    @GetMapping("/orderSumaries")
+    public Page<OrderSumaryDTO> getOrderSumarys(Pageable pageable) {
+        return service.getAllOrderSumary(pageable);
     }
 
     @GetMapping("/{id}")
@@ -85,6 +90,86 @@ public class OrderController {
         if (userDetails == null)
             return null;
         return service.getMyOrderByStatus(userDetails.getUsername(), status);
+    }
+
+    // Lấy số lượng đơn hàng theo time unit (day, month, year)
+    @GetMapping("/quantity/count/unitTime")
+    public ResponseEntity<Long> getOrderCountByTime(@RequestParam("time") String timeUnit) {
+        Long count = service.getcountOrdersByTimeUnit(timeUnit);
+        return ResponseEntity.ok(count);
+    }
+
+    // Lấy tổng giá trị đơn hàng theo time unit (day, month, year)
+    @GetMapping("/sumByUnitTime")
+    public ResponseEntity<Double> getOrderSumByTime(@RequestParam("time") String timeUnit) {
+        Double total = service.getTotalAmountByTimeUnit(timeUnit);
+        return ResponseEntity.ok(total);
+    }
+
+    // Lấy giá của đơn hàng có giá cao nhất theo đơn vị thời gian
+    @GetMapping("maxPriceOfOdersByTimeUnit")
+    public Double getmaxPriceOfOdersByTimeUnit(@RequestParam("time") String timeUnit) {
+        return service.getMaxPriceOfOrdersByTimeUnit(timeUnit);
+    }
+
+    // Lấy ra trung bình doanh thu/ngày
+    @GetMapping("revenuePerDay")
+    public Double getRevenuePerDay(@RequestParam String time) {
+        return service.getRevenuePerDay(time);
+    }
+
+    // Đếm số đơn hàng/ngày
+    @GetMapping("perDay/count/unitTime")
+    public Double getCountOrderPerDay(@RequestParam String time) {
+        return service.getCountOrderPerDayByUnitTime(time);
+    }
+
+    // Đếm số đơn hàng đang xử lý
+    @GetMapping("/resolved/count/unitTime")
+    public Long getcountResolvedOrdersByUnitTime(@RequestParam String time) {
+        return service.getCountOrderDeliveredByUnitTime(time);
+    }
+
+    // Đếm số đơn hàng đã xử lý
+    @GetMapping("/unresolved/count/unitTime")
+    public Long getcountNotResolvedOrdersByUnitTime(@RequestParam String time) {
+        return service.getCountOrderNotDeliveredByUnitTime(time);
+    }
+
+    // Lấy ra danh sách doanh thu theo 4 năm gần đây
+    @GetMapping("sumTotalPricesByYears")
+    public List<Double> getSumTotalPriceByYearByDateAndStatus() {
+        return service.getSumTotalPriceByYearsByDateAndStatus();
+    }
+
+    // Lấy ra danh sách doanh thu theo các tháng trong năm
+    @GetMapping("sumTotalPricesByMonths")
+    public List<Double> getSumTotalPriceByMonthsByDateAndStatus() {
+        return service.getSumTotalPriceByMonthsByDateAndStatus();
+    }
+
+    // Lấy ra danh sách doanh thu theo 7 ngày gần nhất
+    @GetMapping("sumTotalPricesByDays")
+    public List<Double> getSumTotalPriceByDaysByDateAndStatus() {
+        return service.getSumTotalPriceByDaysByDateAndStatus();
+    }
+
+    // Lấy ra số lượng đơn hàng theo 4 năm gần đây
+    @GetMapping("countOrdersByYears")
+    public List<Long> getCountOrdersByYears() {
+        return service.countOrdersByYears();
+    }
+
+    // Lấy ra số lượng đơn hàng theo 4 năm gần đây
+    @GetMapping("countOrdersByMonths")
+    public List<Long> getCountOrdersByMonths() {
+        return service.countOrdersByMonths();
+    }
+
+    // Lấy ra số lượng đơn hàng theo 4 năm gần đây
+    @GetMapping("countOrdersByDays")
+    public List<Long> getCountOrdersByDays() {
+        return service.countOrdersByDays();
     }
 
 }

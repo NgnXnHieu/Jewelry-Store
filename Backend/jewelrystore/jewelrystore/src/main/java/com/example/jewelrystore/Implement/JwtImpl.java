@@ -18,7 +18,7 @@ import java.util.function.Function;
 public class JwtImpl implements JwtService {
 
     private static final String SECRET_KEY = "12345678901234567890123456789012"; // đủ 32 ký tự
-    private static final long ACCESS_TOKEN_EXPIRATION = 1000 * 60 * 1; // 15 phút
+    private static final long ACCESS_TOKEN_EXPIRATION = 1000 * 60 * 15; // 15 phút
     private static final long REFRESH_TOKEN_EXPIRATION = 1000L * 60 * 60 * 24 * 7; // 7 ngày
 
     private Key getSignInKey() {
