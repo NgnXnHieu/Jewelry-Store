@@ -1,5 +1,7 @@
 package com.example.jewelrystore.Controller;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -7,7 +9,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -79,17 +80,28 @@ public class Cart_DetailController {
         return "Xóa thành công";
     }
 
-    @GetMapping("cart_detailsByUserName")
-    public Page<Cart_DetailDTO> getCart_DetailsByUserId(@AuthenticationPrincipal UserDetails userDetails,
-            Pageable pageable) {
-        // 🔹 Cách 2: in ra authentication thực tế khi controller được gọi
-        var auth = SecurityContextHolder.getContext().getAuthentication();
-        System.out.println("Authentication at controller = " + auth);
+    // @GetMapping("cart_detailsByUserName")
+    // public Page<Cart_DetailDTO> getCart_DetailsByUserId(@AuthenticationPrincipal
+    // UserDetails userDetails,
+    // Pageable pageable) {
+    // if (userDetails == null) {
+    // // System.out.println("Hello");
+    // return null; // hoặc ném exception 401
+    // }
+    // return
+    // cart_DetailService.getCart_DetailsByUserName(userDetails.getUsername(),
+    // pageable);
+    // }
+
+    @GetMapping("cart_detailsByUserNameV2")
+    public List<Cart_DetailDTO> getCart_DetailsByUserIdV2(@AuthenticationPrincipal UserDetails userDetails,
+            @RequestParam(required = false) Integer cursor,
+            @RequestParam(defaultValue = "20") int limit) {
         if (userDetails == null) {
             // System.out.println("Hello");
-            return null; // hoặc ném exception 401
+            throw new AccessDeniedException("UnAuthorize");
         }
-        return cart_DetailService.getCart_DetailsByUserName(userDetails.getUsername(), pageable);
+        return cart_DetailService.getCart_DetailsByUserName(userDetails.getUsername(), cursor, limit);
     }
 
 }

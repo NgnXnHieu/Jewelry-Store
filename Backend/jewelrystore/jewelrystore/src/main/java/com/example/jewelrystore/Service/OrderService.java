@@ -23,11 +23,11 @@ public interface OrderService {
 
     void deleteOrder(Integer id);
 
-    List<OrderDTO> getOrdersByUsername(String username);
+    List<OrderDTO> getOrdersByUsername(String username, Integer cursor, int limit);
 
     OrderDTO createMyOrder(OrderCreateForm orderCreateForm, String username);
 
-    List<OrderDTO> getMyOrderByStatus(String username, String status);
+    List<OrderDTO> getMyOrderByStatus(String username, String status, Integer cursor, int limit);
 
     Double getTotalAmountByTimeUnit(String time);
 

@@ -1,5 +1,7 @@
 package com.example.jewelrystore.Service;
 
+import java.util.List;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -18,5 +20,5 @@ public interface Cart_DetailService {
 
     void deleteCart_Detail(Integer id, String userName);
 
-    Page<Cart_DetailDTO> getCart_DetailsByUserName(String userName, Pageable pageable);
+    List<Cart_DetailDTO> getCart_DetailsByUserName(String userName, Integer cursor, int limit);
 }

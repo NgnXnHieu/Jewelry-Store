@@ -20,6 +20,7 @@ import CategoryManagement from "./pages/Admin/CategoryManagement/CategoryManagem
 import OrderManagement from "./pages/Admin/OrderManagement/OrderManagement.jsx";
 import HumanResourcesManagement from "./pages/Admin/HumanResourcesManagement/HumanResourcesManagement.jsx";
 import Inventory from "./pages/Admin/Inventory/Inventory.jsx";
+import AllProduct from "./pages/AllProducts/AllProduct.jsx";
 function App() {
   return (
     <BrowserRouter>
@@ -36,6 +37,7 @@ function App() {
           <Route path="/addressManager" element={<AddressManager />} />
           <Route path="/bestSeller" element={<BestSeller />} />
           <Route path="/category/:id" element={<Category />} />
+          <Route path="/allProducts" element={<AllProduct />} />
         </Route>
 
         {/* Layout không có Header */}

@@ -73,6 +73,11 @@ function Header() {
         setShowMobileMenu(false);
     };
 
+    const goToHome = () => {
+        navigate(`/home`)
+        window.scroll(0, 0)
+    }
+
     const handleSearch = (e) => {
         e.preventDefault();
         if (searchQuery.trim()) {
@@ -88,7 +93,7 @@ function Header() {
                 <Link to="/" className={style.logoLink}>
                     <div className={style.logo}>
                         <span className={style.logoIcon}>💎</span>
-                        <h1 className={style.logoText}>Jewelry Store</h1>
+                        <h1 className={style.logoText} onClick={goToHome}>Jewelry Store</h1>
                     </div>
                 </Link>
 

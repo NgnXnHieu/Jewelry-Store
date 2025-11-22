@@ -1,24 +1,23 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, use } from "react";
 import { useNavigate } from "react-router-dom";
-import style from "./BestSeller.module.css";
+import style from "./AllProduct.module.css";
 import axios from "axios";
 import { FaCheckCircle } from "react-icons/fa";
-import PageNumber from "../../../components/Header/PageNumber/PageNumber";
+import PageNumber from "../../components/Header/PageNumber/PageNumber";
 
-function BestSeller() {
-    const [bestSellers, setBestSellers] = useState([]);
+function AllProduct() {
+    const [products, setProducts] = useState([]);
     const [wishlist, setWishlist] = useState([]);
     const [showNotification, setShowNotification] = useState(false);
     const [currentPage, setCurrentPage] = useState(0);
-    const [totalPages, setTotalPages] = useState(1);
+    const [totalPages, setTotalPages] = useState(0)
     const navigate = useNavigate();
 
     useEffect(() => {
         window.scrollTo(0, 0);
-        axios.get(`http://localhost:8080/api/products/bestSeller?page=${currentPage}&size=20`)
+        axios.get(`http://localhost:8080/api/products?page=${currentPage}&size=20`)
             .then(res => {
-                setBestSellers(res.data.content || res.data);
-                console.log(res.data);
+                setProducts(res.data.content || res.data);
                 setCurrentPage(res.data.number);
                 setTotalPages(res.data.totalPages);
             })
@@ -52,15 +51,15 @@ function BestSeller() {
             <section className={style.heroHeader}>
                 <div className={style.heroContent}>
                     <div className={style.heroText}>
-                        <span className={style.heroSubtitle}>🏆 Top Sản Phẩm</span>
-                        <h1 className={style.heroTitle}>Best Seller</h1>
+                        {/* <span className={style.heroSubtitle}>🏆 Top Sản Phẩm</span> */}
+                        <h1 className={style.heroTitle}>Tất cả sản phẩm</h1>
                         <p className={style.heroDescription}>
-                            Khám phá những sản phẩm bán chạy nhất được yêu thích bởi hàng ngàn khách hàng
+                            Khám phá tất cả sản phẩm được thiết kế với chất liệu cao cấp
                         </p>
                     </div>
                     <div className={style.heroStats}>
                         <div className={style.statCard}>
-                            <div className={style.statNumber}>{bestSellers.length}+</div>
+                            <div className={style.statNumber}>{products.length}+</div>
                             <div className={style.statLabel}>Sản phẩm</div>
                         </div>
                         <div className={style.statCard}>
@@ -81,22 +80,22 @@ function BestSeller() {
                     <div>
                         <h2 className={style.sectionTitle}>✨ Sản phẩm bán chạy nhất</h2>
                         <p className={style.sectionSubtitle}>
-                            {bestSellers.length} sản phẩm được khách hàng tin tưởng và lựa chọn
+                            {products.length} sản phẩm được khách hàng tin tưởng và lựa chọn
                         </p>
                     </div>
                 </div>
 
                 <div className={style.grid}>
-                    {bestSellers.map(product => (
+                    {products.map(product => (
                         <div
                             key={product.id}
                             className={style.card}
                             onClick={() => handleCardClick(product.id)}
                         >
                             <div className={style.cardImageWrapper}>
-                                {product.imageUrl ? (
+                                {product.image_url ? (
                                     <img
-                                        src={`http://localhost:8080/images/${product.imageUrl}`}
+                                        src={`http://localhost:8080/images/${product.image_url}`}
                                         alt={product.name}
                                         className={style.image}
                                     />
@@ -127,7 +126,7 @@ function BestSeller() {
                                     {wishlist.includes(product.id) ? '❤️' : '🤍'}
                                 </button>
 
-                                <span className={style.bestSellerBadge}>🏆 Best Seller</span>
+                                {/* <span className={style.bestSellerBadge}>🏆 Best Seller</span> */}
                             </div>
 
                             <div className={style.cardContent}>
@@ -152,10 +151,10 @@ function BestSeller() {
                     ))}
                 </div>
 
-                {bestSellers.length === 0 && (
+                {products.length === 0 && (
                     <div className={style.emptyState}>
                         <div className={style.emptyIcon}>📦</div>
-                        <h3>Chưa có sản phẩm best seller</h3>
+                        <h3>Chưa có sản phẩm </h3>
                         <p>Hãy quay lại sau để khám phá những sản phẩm bán chạy nhất!</p>
                     </div>
                 )}
@@ -170,8 +169,8 @@ function BestSeller() {
                 <div className={style.featuresGrid}>
                     <div className={style.featureCard}>
                         <div className={style.featureIcon}>🏆</div>
-                        <h3 className={style.featureTitle}>Chất lượng hàng đầu</h3>
-                        <p className={style.featureDesc}>Top sản phẩm được lựa chọn nhiều nhất</p>
+                        <h3 className={style.featureTitle}>Cam kết chất lượng</h3>
+                        <p className={style.featureDesc}>Tất cả sản phẩm đều đúng như mô tả</p>
                     </div>
                     <div className={style.featureCard}>
                         <div className={style.featureIcon}>⭐</div>
@@ -181,12 +180,12 @@ function BestSeller() {
                     <div className={style.featureCard}>
                         <div className={style.featureIcon}>🚀</div>
                         <h3 className={style.featureTitle}>Giao hàng nhanh</h3>
-                        <p className={style.featureDesc}>Ưu tiên giao hàng cho best seller</p>
+                        <p className={style.featureDesc}>Hàng sẽ được giao không quá 5 ngày</p>
                     </div>
                     <div className={style.featureCard}>
                         <div className={style.featureIcon}>💝</div>
-                        <h3 className={style.featureTitle}>Quà tặng độc quyền</h3>
-                        <p className={style.featureDesc}>Nhận quà khi mua best seller</p>
+                        <h3 className={style.featureTitle}>Tích điểm khi mua hàng</h3>
+                        <p className={style.featureDesc}>Khách hàng có thể nhận điểm qua mỗi sản phẩm để quy đổi thành voucher</p>
                     </div>
                 </div>
             </section>
@@ -204,4 +203,4 @@ function BestSeller() {
     );
 }
 
-export default BestSeller;
+export default AllProduct;

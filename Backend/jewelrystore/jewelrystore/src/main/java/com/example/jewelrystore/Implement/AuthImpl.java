@@ -109,7 +109,7 @@ public class AuthImpl implements AuthService {
             accessCookie.setHttpOnly(true);
             accessCookie.setSecure(false);
             accessCookie.setPath("/");
-            accessCookie.setMaxAge(60 * 1); // 15 phút
+            accessCookie.setMaxAge(30); // 15 phút
 
             // Ghi đè lại refresh token cũ bằng cookie mới
             Cookie refreshCookie = new Cookie("refreshToken", newRefreshToken);

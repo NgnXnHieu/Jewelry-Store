@@ -54,7 +54,8 @@ public class SecurityConfig {
                         // .requestMatchers("/api/products", "/api/products/{id}",
                         // "/api/products/getRelatedProducts/{id}")
                         // .permitAll()
-                        .requestMatchers("/api/users/infor", "/api/cart_details/cart_detailsByUserName")
+                        .requestMatchers("/api/users/infor", "/api/cart_details/cart_detailsByUserName",
+                                "/api/orders/**")
                         .authenticated()
                         // .hasAnyRole("USER", "ADMIN")
                         // .anyRequest().authenticated() // các request khác cần xác thực
