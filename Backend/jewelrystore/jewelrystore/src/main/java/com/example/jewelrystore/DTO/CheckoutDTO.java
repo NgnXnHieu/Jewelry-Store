@@ -16,5 +16,7 @@ import lombok.Setter;
 public class CheckoutDTO {
     private Integer id;
     private List<Checkout_ItemDTO> checkout_Items;
-    private Integer addressId;
+    private AddressDTO address;
+    private String qr;
+    // private Integer orderId;
 }

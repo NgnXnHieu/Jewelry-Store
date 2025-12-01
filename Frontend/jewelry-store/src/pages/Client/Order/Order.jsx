@@ -2,7 +2,7 @@ import React, { useEffect, useState, useCallback, useRef } from "react";
 import axiosInstance from "../../../api/axiosInstance";
 import debounce from "lodash.debounce";
 import styles from "./Order.module.css";
-
+import defaultUrl from "../../../api/defaultUrl";
 export default function Order() {
     const [orders, setOrders] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -89,6 +89,7 @@ export default function Order() {
                     return { ...order, orderDetails: updatedDetails };
                 })
             );
+            // console.log(ordersData);
 
             // setOrders(updatedOrders.reverse());
             // --- SỬA ĐOẠN SET STATE ---
@@ -241,7 +242,7 @@ export default function Order() {
                                             <div key={detail.id} className={styles.productCard}>
                                                 <div className={styles.productImage}>
                                                     <img
-                                                        src={`http://localhost:8080/images/${detail.productImage}`}
+                                                        src={`${defaultUrl}/images/${detail.productImage}`}
                                                     />
                                                     <span className={styles.productIndex}>{index + 1}</span>
                                                 </div>

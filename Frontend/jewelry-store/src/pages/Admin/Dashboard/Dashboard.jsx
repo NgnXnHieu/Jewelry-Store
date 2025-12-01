@@ -42,12 +42,12 @@ function Dashboard() {
         try {
             let responses;
             responses = await Promise.all([
-                axiosInstance.get(`http://localhost:8080/api/orders/sumByUnitTime?time=${filterType}`),
-                axiosInstance.get(`http://localhost:8080/api/orders/quantity/count/unitTime?time=${filterType}`),
-                axiosInstance.get(`http://localhost:8080/api/users/customers/count`),
-                axiosInstance.get(`http://localhost:8080/api/users/humanResources/count`),
-                axiosInstance.get("http://localhost:8080/api/products/count"),
-                axiosInstance.get("http://localhost:8080/api/categories/count")
+                axiosInstance.get(`orders/sumByUnitTime?time=${filterType}`),
+                axiosInstance.get(`orders/quantity/count/unitTime?time=${filterType}`),
+                axiosInstance.get(`users/customers/count`),
+                axiosInstance.get(`users/humanResources/count`),
+                axiosInstance.get("products/count"),
+                axiosInstance.get("categories/count")
             ]);
 
             // Gán từng biến từ mảng responses

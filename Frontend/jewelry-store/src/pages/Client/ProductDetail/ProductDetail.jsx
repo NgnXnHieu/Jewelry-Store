@@ -4,7 +4,8 @@ import styles from "./ProductDetail.module.css";
 import { FaStar, FaRegStar, FaHeart, FaRegHeart, FaShoppingCart, FaTruck, FaShieldAlt, FaUndo, FaCheckCircle } from "react-icons/fa";
 import { getProductById, getRelatedProducts } from "../../../api/productApi";
 import { addToCart } from "../../../api/cartApi";
-
+import defaultUrl from "../../../api/defaultUrl";
+import { useBuyNow } from "../../../hook/useBuyNow";
 function ProductDetail() {
     const { id } = useParams();
     const navigate = useNavigate();
@@ -56,15 +57,13 @@ function ProductDetail() {
             }
         }
     };
-
+    const { buyNow, isLoading } = useBuyNow();
     const handleBuyNow = () => {
-        const productData = [
-            {
-                id: product.id,
-                quantity: quantity,
-            },
-        ];
-        navigate("/checkout", { state: { items: productData } });
+        const convertedItem = {
+            id: product.id,
+            quantity: quantity,
+        };
+        buyNow(convertedItem);
     };
 
     const increase = () => {
@@ -115,7 +114,7 @@ function ProductDetail() {
                     <div className={styles.imageGallery}>
                         <div className={styles.mainImageBox}>
                             <img
-                                src={`http://localhost:8080/images/${product.image_url}`}
+                                src={`${defaultUrl}/images/${product.image_url}`}
                                 alt={product.name}
                                 className={styles.mainImage}
                             />
@@ -137,7 +136,7 @@ function ProductDetail() {
                                     onClick={() => setSelectedImage(index)}
                                 >
                                     {/* các ảnh góc khác của sản phẩm */}
-                                    <img src={`http://localhost:8080/images/${product.image_url}`} alt={`${product.name} ${index + 1}`} />
+                                    <img src={`${defaultUrl}/images/${product.image_url}`} alt={`${product.name} ${index + 1}`} />
                                 </div>
                             ))}
                         </div>
@@ -325,7 +324,7 @@ function ProductDetail() {
                         {relatedProducts.map((p) => (
                             <div key={p.id} className={styles.relatedCard}>
                                 <div className={styles.relatedImageWrapper}>
-                                    <img src={`http://localhost:8080/images/${p.image_url}`} alt={p.name} />
+                                    <img src={`${defaultUrl}/images/${p.image_url}`} alt={p.name} />
 
                                 </div>
                                 <div className={styles.relatedContent}>

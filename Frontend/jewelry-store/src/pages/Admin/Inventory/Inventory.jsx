@@ -3,89 +3,7 @@ import styles from './Inventory.module.css';
 import axiosInstance from '../../../api/axiosInstance';
 import { Users, Plus, Search, Edit2, Trash2, X, Upload, ChevronLeft, ChevronRight } from 'lucide-react';
 import Swal from "sweetalert2";
-
-const MOCK_STOCK_HISTORY = [
-    {
-        id: 1,
-        productId: 'JW001',
-        productName: 'Diamond Engagement Ring',
-        productImage: 'https://images.unsplash.com/photo-1605100804763-247f67b3557e?w=400',
-        quantityAdded: 10,
-        date: '2024-11-01T10:30:00',
-        quantityAfter: 15,
-        addedBy: 'Sarah Johnson',
-    },
-    {
-        id: 2,
-        productId: 'JW002',
-        productName: 'Gold Necklace',
-        productImage: 'https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=400',
-        quantityAdded: 5,
-        date: '2024-11-02T14:15:00',
-        quantityAfter: 8,
-        addedBy: 'Michael Chen',
-    },
-    {
-        id: 3,
-        productId: 'JW004',
-        productName: 'Silver Bracelet',
-        productImage: 'https://images.unsplash.com/photo-1611591437281-460bfbe1220a?w=400',
-        quantityAdded: 15,
-        date: '2024-11-03T09:00:00',
-        quantityAfter: 25,
-        addedBy: 'Sarah Johnson',
-    },
-    {
-        id: 4,
-        productId: 'JW001',
-        productName: 'Diamond Engagement Ring',
-        productImage: 'https://images.unsplash.com/photo-1605100804763-247f67b3557e?w=400',
-        quantityAdded: 5,
-        date: '2024-10-28T11:20:00',
-        quantityAfter: 5,
-        addedBy: 'Emily Davis',
-    },
-    {
-        id: 5,
-        productId: 'JW005',
-        productName: 'Sapphire Pendant',
-        productImage: 'https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=400',
-        quantityAdded: 3,
-        date: '2024-11-04T16:45:00',
-        quantityAfter: 3,
-        addedBy: 'Michael Chen',
-    },
-    {
-        id: 6,
-        productId: 'JW007',
-        productName: 'Emerald Brooch',
-        productImage: 'https://images.unsplash.com/photo-1617038260897-41a1f14a8ca0?w=400',
-        quantityAdded: 12,
-        date: '2024-11-05T13:30:00',
-        quantityAfter: 12,
-        addedBy: 'Sarah Johnson',
-    },
-    {
-        id: 7,
-        productId: 'JW008',
-        productName: 'Platinum Wedding Band',
-        productImage: 'https://images.unsplash.com/photo-1605100804763-247f67b3557e?w=400',
-        quantityAdded: 8,
-        date: '2024-11-05T15:00:00',
-        quantityAfter: 18,
-        addedBy: 'Emily Davis',
-    },
-    {
-        id: 8,
-        productId: 'JW002',
-        productName: 'Gold Necklace',
-        productImage: 'https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=400',
-        quantityAdded: 3,
-        date: '2024-10-30T10:00:00',
-        quantityAfter: 3,
-        addedBy: 'Michael Chen',
-    },
-];
+import defaultUrl from '../../../api/defaultUrl';
 
 export default function Inventory() {
     const [products, setProducts] = useState([]);
@@ -440,10 +358,10 @@ export default function Inventory() {
                                             </td>
                                             <td>
                                                 <img
-                                                    src={`http://localhost:8080/images/${product.image_url}`}
+                                                    src={`${defaultUrl}/images/${product.image_url}`}
                                                     alt={product.name}
                                                     className={styles.productImage}
-                                                    onClick={() => setFullSizeImage({ url: `http://localhost:8080/images/${product.image_url}`, name: product.name })}
+                                                    onClick={() => setFullSizeImage({ url: `${defaultUrl}/images/${product.image_url}`, name: product.name })}
                                                     style={{ cursor: 'pointer' }}
 
                                                 />
@@ -523,10 +441,10 @@ export default function Inventory() {
                                             </td>
                                             <td>
                                                 <img
-                                                    src={`http://localhost:8080/images/${entry.image_url}`}
+                                                    src={`${defaultUrl}/images/${entry.image_url}`}
                                                     alt={entry.productName}
                                                     className={styles.productImage}
-                                                    onClick={() => setFullSizeImage({ url: `http://localhost:8080/images/${entry.image_url}`, name: entry.productName })}
+                                                    onClick={() => setFullSizeImage({ url: `${defaultUrl}/images/${entry.image_url}`, name: entry.productName })}
                                                     style={{ cursor: 'pointer' }}
                                                 />
                                             </td>

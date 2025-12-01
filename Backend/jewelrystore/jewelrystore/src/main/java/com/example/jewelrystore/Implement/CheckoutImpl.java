@@ -122,7 +122,7 @@ public class CheckoutImpl implements CheckoutService {
         if (checkout.getUser().getUsername().equalsIgnoreCase(username)) {
             return checkoutMapper.toCheckoutDTO(checkout);
         }
-        return null;
+        throw new AccessDeniedException("Not Permisson to use this checkoutID");
     }
 
     @Override
@@ -227,6 +227,7 @@ public class CheckoutImpl implements CheckoutService {
                 Long quantity = item.getQuantity();
                 order_Detail.setQuantity(quantity);
                 order_Detail.setPrice(price);
+                order_Detail.setTotalPrice(price * quantity);
                 totalQuantity += quantity;
                 totalPrice += price * quantity;
                 product.setQuantity(product.getQuantity() - quantity);
@@ -269,6 +270,7 @@ public class CheckoutImpl implements CheckoutService {
         checkoutRepository.save(checkout);
     }
 
+    // Cần sửa lại bao giờ quét mã xong mới tạo đơn hàng
     // Thêm transaction tránh rủi ro kho trừ số lượng nhưng trạng thái checkout chưa
     // kịp cập nhật -> lần sau quay lại thì lại trừ kho lần nữa -> lỗi
     @Transactional
@@ -311,6 +313,7 @@ public class CheckoutImpl implements CheckoutService {
                 Long quantity = item.getQuantity();
                 order_Detail.setQuantity(quantity);
                 order_Detail.setPrice(price);
+                order_Detail.setTotalPrice(price * quantity);
                 totalQuantity += quantity;
                 totalPrice += price * quantity;
                 // Trừ số lượng trong kho
@@ -336,6 +339,7 @@ public class CheckoutImpl implements CheckoutService {
             checkout.setQr(qr);
             checkout.setOrder(order);
             checkout.setStatus(CheckoutStatus.PAYMENT_PENDING);
+            checkout.setAddress(address);
             checkoutRepository.save(checkout);
             productRepository.saveAll(products);
         }
@@ -443,5 +447,19 @@ public class CheckoutImpl implements CheckoutService {
         }
         return null;
     }
+
+	@Override
+	public Boolean checkStatus(Integer checkoutId, String username) {
+		Checkout checkout = checkoutRepository.findById(checkoutId)
+                .orElseThrow(() -> new RuntimeException("Checkout Not Found"));
+        if (checkout.getUser().getUsername().equalsIgnoreCase(username)) {
+            if(checkout.getStatus() == CheckoutStatus.COMPLETED) {
+                return true;
+            } else {
+                return false;
+            }
+        }       
+        throw new AccessDeniedException("Not Permisson to use this checkoutID");
+	}
 
 }

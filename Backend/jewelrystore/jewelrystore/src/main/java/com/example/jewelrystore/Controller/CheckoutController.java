@@ -52,6 +52,14 @@ public class CheckoutController {
         return checkoutService.placeOrder(form, userDetails.getUsername());
     }
 
+    @GetMapping("/{id}/checkStatus")
+    public Boolean checkStatus(@PathVariable Integer id, @AuthenticationPrincipal UserDetails userDetails) {
+        if (userDetails == null) {
+            throw new AccessDeniedException("You don't have permission to change quantity this item");
+        }
+        return checkoutService.checkStatus(id, userDetails.getUsername());
+    }
+
     // Hàm tạo api lấy mã qr để test
     // @PostMapping("testWeebHook")
     // public String testWeebHook() {

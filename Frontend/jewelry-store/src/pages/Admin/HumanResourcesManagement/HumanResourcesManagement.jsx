@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-
+import defaultUrl from "../../../api/defaultUrl";
 import styles from './HumanResourcesManagement.module.css';
 import { Users, Plus, Search, Edit2, Trash2, X, Upload, ChevronLeft, ChevronRight } from 'lucide-react';
 // import { Avatar, AvatarImage, AvatarFallback } from './ui/avatar';
@@ -324,10 +324,10 @@ export default function HumanResourcesManagement() {
                                             <div className={styles.imageCell}>
                                                 {user.image_url ? (
                                                     <img
-                                                        src={`http://localhost:8080/images/${user.image_url}`}
+                                                        src={`${defaultUrl}/images/${user.image_url}`}
                                                         alt={user.name}
                                                         className={styles.userImage}
-                                                        onClick={() => setFullSizeImage({ url: `http://localhost:8080/images/${user.image_url}`, name: user.name })}
+                                                        onClick={() => setFullSizeImage({ url: `${defaultUrl}/images/${user.image_url}`, name: user.name })}
                                                         style={{ cursor: 'pointer' }}
                                                     />
                                                 ) : (
@@ -467,7 +467,7 @@ export default function HumanResourcesManagement() {
                                             <div className={styles.imagePreviewWrapper}>
                                                 {/* Hiển thị ảnh nếu tồn tại */}
                                                 <img
-                                                    src={imagePreview || `http://localhost:8080/images/${currentUser.image_url}`}
+                                                    src={imagePreview || `${defaultUrl}/images/${currentUser.image_url}`}
                                                     alt="Preview"
                                                     className={styles.imagePreview}
                                                 />

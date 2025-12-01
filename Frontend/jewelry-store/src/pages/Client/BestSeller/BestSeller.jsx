@@ -4,7 +4,9 @@ import style from "./BestSeller.module.css";
 import axios from "axios";
 import { FaCheckCircle } from "react-icons/fa";
 import PageNumber from "../../../components/Header/PageNumber/PageNumber";
-
+import defaultUrl from "../../../api/defaultUrl";
+import axiosInstance from "../../../api/axiosInstance";
+import { useBuyNow } from "../../../hook/useBuyNow";
 function BestSeller() {
     const [bestSellers, setBestSellers] = useState([]);
     const [wishlist, setWishlist] = useState([]);
@@ -15,7 +17,7 @@ function BestSeller() {
 
     useEffect(() => {
         window.scrollTo(0, 0);
-        axios.get(`http://localhost:8080/api/products/bestSeller?page=${currentPage}&size=20`)
+        axios.get(`products/bestSeller?page=${currentPage}&size=20`)
             .then(res => {
                 setBestSellers(res.data.content || res.data);
                 console.log(res.data);
@@ -96,7 +98,7 @@ function BestSeller() {
                             <div className={style.cardImageWrapper}>
                                 {product.imageUrl ? (
                                     <img
-                                        src={`http://localhost:8080/images/${product.imageUrl}`}
+                                        src={`${defaultUrl}/images/${product.imageUrl}`}
                                         alt={product.name}
                                         className={style.image}
                                     />

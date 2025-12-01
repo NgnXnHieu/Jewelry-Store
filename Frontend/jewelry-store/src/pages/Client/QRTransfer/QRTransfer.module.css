@@ -1,0 +1,537 @@
+/* Container */
+.qrContainer {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    padding: 20px;
+}
+
+/* Header */
+.header {
+    text-align: center;
+    margin-bottom: 30px;
+    padding: 40px 20px;
+}
+
+.headerContent {
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.headerIcon {
+    font-size: 64px;
+    margin-bottom: 20px;
+    animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+
+    0%,
+    100% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.1);
+    }
+}
+
+.headerTitle {
+    color: white;
+    margin-bottom: 10px;
+}
+
+.headerSubtitle {
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 16px;
+}
+
+/* Timer Box */
+.timerBox {
+    max-width: 400px;
+    margin: 0 auto 30px;
+    background: white;
+    padding: 20px 30px;
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+}
+
+.timerIcon {
+    font-size: 32px;
+}
+
+.timerContent {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+}
+
+.timerLabel {
+    font-size: 14px;
+    color: #666;
+    margin-bottom: 5px;
+}
+
+.timerValue {
+    font-size: 28px;
+    color: #667eea;
+    font-family: 'Courier New', monospace;
+}
+
+/* Content Grid */
+.contentGrid {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 30px;
+}
+
+/* Left Section */
+.leftSection {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+/* QR Card */
+.qrCard {
+    background: white;
+    border-radius: 20px;
+    padding: 30px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+}
+
+.sectionTitle {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 25px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid #f0f0f0;
+}
+
+.sectionTitle span {
+    font-size: 24px;
+}
+
+.qrWrapper {
+    text-align: center;
+}
+
+.qrBox {
+    display: inline-flex;
+    padding: 5px;
+    width: 300px;
+    height: 300px;
+    background: white;
+    border: 3px solid #667eea;
+    border-radius: 16px;
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+    margin-bottom: 15px;
+}
+
+.qrBox img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.qrInstruction {
+    color: #666;
+    font-size: 14px;
+    margin: 0;
+}
+
+/* Bank Card */
+.bankCard {
+    background: white;
+    border-radius: 20px;
+    padding: 30px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+}
+
+.bankInfoList {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.bankInfoItem {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px;
+    background: #f8f9fa;
+    border-radius: 12px;
+}
+
+.bankLabel {
+    color: #666;
+    font-size: 14px;
+}
+
+.bankValue {
+    color: #333;
+    font-size: 16px;
+}
+
+.amountHighlight {
+    color: #667eea;
+    font-size: 20px;
+}
+
+.copyGroup {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.copyButton {
+    background: #667eea;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 8px 12px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: all 0.3s ease;
+}
+
+.copyButton:hover {
+    background: #5568d3;
+    transform: scale(1.05);
+}
+
+/* Warning Box */
+.warningBox {
+    display: flex;
+    gap: 12px;
+    padding: 16px;
+    background: #fff3cd;
+    border: 1px solid #ffc107;
+    border-radius: 12px;
+    margin-top: 20px;
+}
+
+.warningIcon {
+    font-size: 24px;
+    flex-shrink: 0;
+}
+
+.warningText {
+    color: #856404;
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+/* Confirm Button */
+.confirmButton {
+    width: 100%;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    border-radius: 16px;
+    padding: 18px;
+    font-size: 18px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
+.confirmButton:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(102, 126, 234, 0.4);
+}
+
+.confirmButton span {
+    font-size: 20px;
+}
+
+/* Right Section */
+.rightSection {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+/* Order Card */
+.orderCard {
+    background: white;
+    border-radius: 20px;
+    padding: 30px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+}
+
+.orderList {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-bottom: 20px;
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.orderItem {
+    display: flex;
+    gap: 15px;
+    padding: 15px;
+    background: #f8f9fa;
+    border-radius: 12px;
+    position: relative;
+}
+
+.itemImage {
+    position: relative;
+    width: 80px;
+    height: 80px;
+    flex-shrink: 0;
+    border-radius: 10px;
+    overflow: hidden;
+    background: #e9ecef;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.itemImage img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.noImage {
+    font-size: 32px;
+}
+
+.itemBadge {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    background: #667eea;
+    color: white;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    border: 3px solid white;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.itemDetails {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.itemName {
+    color: #333;
+    margin: 0;
+}
+
+.itemPrice {
+    color: #666;
+    font-size: 14px;
+    margin: 0;
+}
+
+.itemTotal {
+    color: #667eea;
+    margin: 0;
+}
+
+/* Order Summary */
+.orderSummary {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 20px;
+    background: #f8f9fa;
+    border-radius: 12px;
+    margin-bottom: 20px;
+}
+
+.summaryRow {
+    display: flex;
+    justify-content: space-between;
+    color: #666;
+}
+
+.freeShipping {
+    color: #28a745;
+}
+
+/* Total Box */
+.totalBox {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 12px;
+    color: white;
+}
+
+.totalLabel {
+    font-size: 18px;
+}
+
+.totalValue {
+    font-size: 24px;
+}
+
+/* Address Card */
+.addressCard {
+    background: white;
+    border-radius: 20px;
+    padding: 30px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+}
+
+.addressInfo {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.addressRow {
+    display: flex;
+    gap: 15px;
+    padding: 15px;
+    background: #f8f9fa;
+    border-radius: 12px;
+}
+
+.addressIcon {
+    font-size: 24px;
+    flex-shrink: 0;
+}
+
+.addressDetails {
+    flex: 1;
+}
+
+.addressLabel {
+    color: #666;
+    font-size: 14px;
+    margin: 0 0 5px 0;
+}
+
+.addressValue {
+    color: #333;
+    margin: 0;
+}
+
+/* Instruction Card */
+.instructionCard {
+    background: white;
+    border-radius: 20px;
+    padding: 30px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+}
+
+.instructionTitle {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid #f0f0f0;
+}
+
+.instructionList {
+    margin: 0;
+    padding-left: 25px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.instructionList li {
+    color: #555;
+    line-height: 1.6;
+}
+
+/* Empty Container */
+.emptyContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    padding: 40px;
+    text-align: center;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.emptyIcon {
+    font-size: 64px;
+    margin-bottom: 20px;
+}
+
+.emptyContainer h3 {
+    color: white;
+    margin-bottom: 20px;
+}
+
+.emptyContainer button {
+    background: white;
+    color: #667eea;
+    border: none;
+    border-radius: 12px;
+    padding: 14px 28px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.emptyContainer button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .contentGrid {
+        grid-template-columns: 1fr;
+    }
+
+    .headerIcon {
+        font-size: 48px;
+    }
+
+    .timerBox {
+        padding: 15px 20px;
+    }
+
+    .timerValue {
+        font-size: 24px;
+    }
+
+    .qrCard,
+    .bankCard,
+    .orderCard,
+    .addressCard,
+    .instructionCard {
+        padding: 20px;
+    }
+
+    .qrBox {
+        padding: 15px;
+    }
+
+    .itemImage {
+        width: 60px;
+        height: 60px;
+    }
+}

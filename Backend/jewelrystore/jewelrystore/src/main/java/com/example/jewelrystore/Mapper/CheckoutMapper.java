@@ -18,8 +18,9 @@ import com.example.jewelrystore.Entity.Checkout_Item;
 public abstract class CheckoutMapper {
     @Autowired
     Checkout_ItemMapper checkout_ItemMapper;
+    @Autowired
+    AddressMapper AddressMapper;
 
-    @Mapping(source = "address.id", target = "addressId")
     public abstract CheckoutDTO toCheckoutDTO(Checkout checkout);
 
     @AfterMapping
@@ -29,6 +30,7 @@ public abstract class CheckoutMapper {
             list.add(checkout_ItemMapper.toCheckout_ItemDTO(item));
         }
         checkoutDTO.setCheckout_Items(list);
+        checkoutDTO.setAddress(AddressMapper.toAddressDTO(checkout.getAddress()));
     }
 
 }

@@ -5,6 +5,7 @@ import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -12,7 +13,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
-import com.example.jewelrystore.DTO.LoginDTO;
 import com.example.jewelrystore.Form.UserForm.LoginForm;
 import com.example.jewelrystore.Repository.UserRepository;
 import com.example.jewelrystore.Service.AuthService;
@@ -21,6 +21,7 @@ import com.example.jewelrystore.Service.JwtService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.http.HttpHeaders;
 
 @Service
 public class AuthImpl implements AuthService {
@@ -105,25 +106,30 @@ public class AuthImpl implements AuthService {
             String newAccessToken = jwtService.generateToken(username, role);
             String newRefreshToken = jwtService.generateRefreshToken(username, role);
 
-            Cookie accessCookie = new Cookie("accessToken", newAccessToken);
-            accessCookie.setHttpOnly(true);
-            accessCookie.setSecure(false);
-            accessCookie.setPath("/");
-            accessCookie.setMaxAge(30); // 15 phút
+            ResponseCookie accessCookie = ResponseCookie.from("accessToken", newAccessToken)
+                    .httpOnly(true)
+                    .secure(true)
+                    .path("/")
+                    .maxAge(60) // 15 phút
+                    .sameSite("None")
+                    .build();
 
             // Ghi đè lại refresh token cũ bằng cookie mới
-            Cookie refreshCookie = new Cookie("refreshToken", newRefreshToken);
-            refreshCookie.setHttpOnly(true);
-            refreshCookie.setSecure(false);
-            refreshCookie.setPath("/");
-            refreshCookie.setMaxAge(60 * 60 * 24 * 7); // 7 ngày
+            ResponseCookie refreshCookie = ResponseCookie.from("refreshToken", newRefreshToken)
+                    .httpOnly(true)
+                    .secure(true)
+                    .path("/")
+                    .maxAge(60 * 60 * 24 * 7) // 7 ngày
+                    .sameSite("None")
+                    .build();
 
-            response.addCookie(accessCookie);
-            response.addCookie(refreshCookie);
             // Trả role trong body
             Map<String, String> body = new HashMap<>();
             body.put("role", role);
-            return ResponseEntity.ok(body);
+            return ResponseEntity.ok()
+                    .header(HttpHeaders.SET_COOKIE, accessCookie.toString()) // Gắn cookie 1
+                    .header(HttpHeaders.SET_COOKIE, refreshCookie.toString()) // Gắn cookie 2
+                    .body(body);
             // return ResponseEntity.ok("Access token refreshed successfully");
 
         } catch (
@@ -135,42 +141,46 @@ public class AuthImpl implements AuthService {
 
     @Override
     public ResponseEntity<Map<String, String>> login(LoginForm request, HttpServletResponse response) {
-        // Xác thực tài khoản, mật khẩu
+        // 1. Xác thực (Giữ nguyên)
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword()));
-        // Lấy role của user sau khi xác thực
+
         String role = authentication.getAuthorities().stream()
-                .findFirst()
-                .map(Object::toString)
-                .orElse("USER"); // nếu không có quyền thì mặc định là USER
-        // Sau khi gọi authenticationManager.authenticate() AuthenticationManager tự
-        // động gọi AuthenticationProvider --> gọi loadUserByUsername(username)
+                .findFirst().map(Object::toString).orElse("USER");
+
+        // 2. Tạo Token (Giữ nguyên)
         String accessToken = jwtService.generateToken(authentication.getName(), role);
         String refreshToken = jwtService.generateRefreshToken(authentication.getName(), role);
 
-        // Tạo cookies
-        Cookie accessCookie = new Cookie("accessToken", accessToken);
-        accessCookie.setHttpOnly(true);
-        accessCookie.setSecure(true); // Bật khi deploy HTTPS
-        accessCookie.setPath("/");
-        accessCookie.setMaxAge(60 * 15); // 15 phút
+        // 3. TẠO COOKIE BẰNG RESPONSE COOKIE (Sửa đoạn này)
+        // Lưu ý: Cần import org.springframework.http.ResponseCookie
 
-        Cookie refreshCookie = new Cookie("refreshToken", refreshToken);
-        refreshCookie.setHttpOnly(true);
-        refreshCookie.setSecure(true);
-        refreshCookie.setPath("/");
-        refreshCookie.setMaxAge(60 * 60 * 24 * 7); // 7 ngày
+        ResponseCookie accessCookie = ResponseCookie.from("accessToken", accessToken)
+                .httpOnly(true)
+                .secure(true) // Bắt buộc true để chạy với Ngrok
+                .path("/")
+                .maxAge(60) // 15 phút
+                .sameSite("None") // QUAN TRỌNG: Dòng này giúp vượt qua chặn Cross-site
+                .build();
 
-        accessCookie.setSecure(false);
-        refreshCookie.setSecure(false);
+        ResponseCookie refreshCookie = ResponseCookie.from("refreshToken", refreshToken)
+                .httpOnly(true)
+                .secure(true) // Bắt buộc true
+                .path("/")
+                .maxAge(7 * 24 * 60 * 60) // 7 ngày
+                .sameSite("None") // QUAN TRỌNG
+                .build();
 
-        // 🔹 4. Gắn cookies vào response
-        response.addCookie(accessCookie);
-        response.addCookie(refreshCookie);
-        // Trả role trong body
+        // 4. Trả về Response (Sửa đoạn này)
+        // Thay vì dùng response.addCookie(), ta gắn thẳng vào Header của ResponseEntity
+
         Map<String, String> body = new HashMap<>();
         body.put("role", role);
-        return ResponseEntity.ok(body);
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.SET_COOKIE, accessCookie.toString()) // Gắn cookie 1
+                .header(HttpHeaders.SET_COOKIE, refreshCookie.toString()) // Gắn cookie 2
+                .body(body);
     }
 
     // 🔴 Đăng xuất — xóa cookies

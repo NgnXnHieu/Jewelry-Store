@@ -4,7 +4,8 @@ import style from "./AllProduct.module.css";
 import axios from "axios";
 import { FaCheckCircle } from "react-icons/fa";
 import PageNumber from "../../components/Header/PageNumber/PageNumber";
-
+import defaultUrl from "../../api/defaultUrl";
+import axiosInstance from "../../api/axiosInstance";
 function AllProduct() {
     const [products, setProducts] = useState([]);
     const [wishlist, setWishlist] = useState([]);
@@ -15,7 +16,7 @@ function AllProduct() {
 
     useEffect(() => {
         window.scrollTo(0, 0);
-        axios.get(`http://localhost:8080/api/products?page=${currentPage}&size=20`)
+        axiosInstance.get(`products?page=${currentPage}&size=20`)
             .then(res => {
                 setProducts(res.data.content || res.data);
                 setCurrentPage(res.data.number);
@@ -95,7 +96,7 @@ function AllProduct() {
                             <div className={style.cardImageWrapper}>
                                 {product.image_url ? (
                                     <img
-                                        src={`http://localhost:8080/images/${product.image_url}`}
+                                        src={`${defaultUrl}/images/${product.image_url}`}
                                         alt={product.name}
                                         className={style.image}
                                     />

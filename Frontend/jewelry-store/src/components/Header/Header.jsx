@@ -59,7 +59,7 @@ function Header() {
     // Fetch categories
     useEffect(() => {
         axiosInstance
-            .get("http://localhost:8080/api/categories")
+            .get("/categories")
             .then((res) => {
                 setCategories(res.data.content || res.data);
             })

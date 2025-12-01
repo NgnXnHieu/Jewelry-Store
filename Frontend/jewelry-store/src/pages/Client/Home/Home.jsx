@@ -5,10 +5,10 @@ import { getAllProducts } from "../../../api/productApi";
 import { addToCart } from "../../../api/cartApi";
 import { FaCheckCircle } from "react-icons/fa";
 import axios from "../../../api/axiosInstance";
-
+import defaultUrl from "../../../api/defaultUrl";
 function Home() {
     useEffect(() => {
-        axios.get("http://localhost:8080/api/products/bestSeller?page=0?size=10")
+        axios.get("products/bestSeller?page=0&size=10")
             .then(res => {
                 setBestSellers(res.data.content || res.data);
             })
@@ -204,7 +204,7 @@ function Home() {
                         >
                             <div className={style.cardImageWrapper}>
                                 {product.imageUrl ? (<img
-                                    src={`http://localhost:8080/images/${product.imageUrl}`}
+                                    src={`${defaultUrl}/images/${product.imageUrl}`}
                                     alt={product.name}
                                     className={style.image}
                                 />) : (
@@ -287,7 +287,7 @@ function Home() {
                                     /> */}
                                     {/* {console.log(product)} */}
                                     {product.image_url ? (<img
-                                        src={`http://localhost:8080/images/${product.image_url}`}
+                                        src={`${defaultUrl}/images/${product.image_url}`}
                                         alt={product.name}
                                         className={style.image}
                                     />) : (

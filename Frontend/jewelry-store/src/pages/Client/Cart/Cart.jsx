@@ -4,7 +4,8 @@ import styles from "./Cart.module.css";
 import Swal from "sweetalert2";
 import debounce from "lodash.debounce";
 import { useNavigate } from "react-router-dom";
-
+import defaultUrl from "../../../api/defaultUrl";
+import { useBuyNow } from "../../../hook/useBuyNow";
 const Cart = () => {
     // --- STATE DỮ LIỆU ---
     const [cartItems, setCartItems] = useState([]);
@@ -124,12 +125,10 @@ const Cart = () => {
         );
     };
 
+    const { buyNow, isLoading } = useBuyNow();
     const handleBuyOne = (item) => {
-        navigate("/checkout", {
-            state: {
-                items: [{ id: item.id, productId: item.productId, quantity: item.quantity }]
-            }
-        });
+        const convertedItem = { id: item.productId, quantity: item.quantity };
+        buyNow(convertedItem);
     };
 
     const selectAll = (checked) => {
@@ -179,13 +178,11 @@ const Cart = () => {
             });
             return;
         }
-        navigate("/checkout", {
-            state: {
-                items: selected.map((item) => ({
-                    id: item.id, productId: item.productId, quantity: item.quantity
-                }))
-            }
-        });
+        const itemsToCheckout = selected.map((item) => ({
+            id: item.productId,
+            quantity: item.quantity
+        }));
+        buyNow(itemsToCheckout);
     };
 
     const removeItem = async (id) => {
@@ -300,7 +297,7 @@ const Cart = () => {
                                     </div>
 
                                     <div className={styles.cardImage}>
-                                        <img src={`http://localhost:8080/images/${item.image}`} alt={item.name} />
+                                        <img src={`${defaultUrl}/images/${item.image}`} alt={item.name} />
                                         <span className={styles.itemNumber}>{index + 1}</span>
                                     </div>
 
