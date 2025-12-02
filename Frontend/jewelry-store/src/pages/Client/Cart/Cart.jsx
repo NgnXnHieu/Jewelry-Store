@@ -6,6 +6,7 @@ import debounce from "lodash.debounce";
 import { useNavigate } from "react-router-dom";
 import defaultUrl from "../../../api/defaultUrl";
 import { useBuyNow } from "../../../hook/useBuyNow";
+
 const Cart = () => {
     // --- STATE DỮ LIỆU ---
     const [cartItems, setCartItems] = useState([]);
@@ -226,7 +227,7 @@ const Cart = () => {
     if (loading) {
         return (
             <div className={styles.container}>
-                <div className={styles.loadingContainer}>
+                <div id="loading-spinner" className={styles.loadingContainer}>
                     <div className={styles.spinner}></div>
                     <p className={styles.loadingText}>Đang tải giỏ hàng...</p>
                 </div>
@@ -238,7 +239,7 @@ const Cart = () => {
         <div className={styles.container}>
             <div className={styles.header}>
                 <div className={styles.headerContent}>
-                    <h1 className={styles.title}>🛒 Giỏ hàng của tôi</h1>
+                    <h1 id="cart-title" className={styles.title}>🛒 Giỏ hàng của tôi</h1>
                     <p className={styles.subtitle}>
                         {cartItems.length > 0
                             ? `Danh sách sản phẩm`
@@ -249,13 +250,14 @@ const Cart = () => {
             </div>
 
             {cartItems.length === 0 && !loading ? (
-                <div className={styles.emptyCart}>
+                <div id="empty-cart-container" className={styles.emptyCart}>
                     <div className={styles.emptyIcon}>🛍️</div>
                     <h2 className={styles.emptyTitle}>Giỏ hàng trống</h2>
                     <p className={styles.emptyText}>
                         Hãy thêm sản phẩm vào giỏ hàng để tiếp tục mua sắm
                     </p>
                     <button
+                        id="btn-go-shopping"
                         className={styles.shopNowButton}
                         onClick={() => navigate("/")}
                     >
@@ -267,6 +269,7 @@ const Cart = () => {
                     <div className={styles.selectAllBar}>
                         <label className={styles.selectAllLabel}>
                             <input
+                                id="chk-select-all"
                                 type="checkbox"
                                 className={styles.checkbox}
                                 checked={allSelected}
@@ -284,11 +287,13 @@ const Cart = () => {
                             return (
                                 <div
                                     key={item.id}
+                                    id={`cart-item-${item.productId}`} // ✅ ID Card SP
                                     ref={isLastElement ? lastCartItemRef : null} // Gắn Ref lính gác
                                     className={`${styles.cartCard} ${item.selected ? styles.selected : ''}`}
                                 >
                                     <div className={styles.cardCheckbox}>
                                         <input
+                                            id={`chk-item-${item.productId}`} // ✅ ID Checkbox
                                             type="checkbox"
                                             className={styles.checkbox}
                                             checked={item.selected}
@@ -302,8 +307,8 @@ const Cart = () => {
                                     </div>
 
                                     <div className={styles.cardInfo}>
-                                        <h3 className={styles.itemName}>{item.name}</h3>
-                                        <p className={styles.itemPrice}>
+                                        <h3 id={`item-name-${item.productId}`} className={styles.itemName}>{item.name}</h3>
+                                        <p id={`item-price-${item.productId}`} className={styles.itemPrice}>
                                             {item.price.toLocaleString()}₫
                                         </p>
                                     </div>
@@ -311,12 +316,19 @@ const Cart = () => {
                                     <div className={styles.cardQuantity}>
                                         <div className={styles.quantityControl}>
                                             <button
+                                                id={`btn-decrease-${item.productId}`} // ✅ ID Nút giảm
                                                 className={styles.quantityBtn}
                                                 onClick={() => decrease(item.id)}
                                                 disabled={item.quantity <= 1}
                                             >−</button>
-                                            <span className={styles.quantityValue}>{item.quantity}</span>
+                                            <span
+                                                id={`qty-display-${item.productId}`} // ✅ ID Số lượng
+                                                className={styles.quantityValue}
+                                            >
+                                                {item.quantity}
+                                            </span>
                                             <button
+                                                id={`btn-increase-${item.productId}`} // ✅ ID Nút tăng
                                                 className={styles.quantityBtn}
                                                 onClick={() => increase(item.id)}
                                             >+</button>
@@ -324,18 +336,20 @@ const Cart = () => {
                                     </div>
 
                                     <div className={styles.cardTotal}>
-                                        <p className={styles.totalPrice}>
+                                        <p id={`item-total-${item.productId}`} className={styles.totalPrice}>
                                             {(item.price * item.quantity).toLocaleString()}₫
                                         </p>
                                     </div>
 
                                     <div className={styles.cardActions}>
                                         <button
+                                            id={`btn-delete-${item.productId}`} // ✅ ID Nút Xóa
                                             className={styles.deleteBtn}
                                             onClick={() => removeItem(item.id)}
                                             title="Xóa sản phẩm"
                                         >🗑️</button>
                                         <button
+                                            id={`btn-buy-now-${item.productId}`} // ✅ ID Mua ngay
                                             className={styles.buyOneBtn}
                                             onClick={() => handleBuyOne(item)}
                                         >Mua ngay</button>
@@ -347,14 +361,14 @@ const Cart = () => {
 
                     {/* 👇 HIỂN THỊ LOADING KHI CUỘN */}
                     {isFetchingMore && (
-                        <div className={styles.loadingContainer} style={{ padding: '20px' }}>
+                        <div id="loading-more" className={styles.loadingContainer} style={{ padding: '20px' }}>
                             <div className={styles.spinner}></div>
                             <p className={styles.loadingText}>Đang tải thêm...</p>
                         </div>
                     )}
 
                     {!hasMore && cartItems.length > 0 && (
-                        <p style={{ textAlign: 'center', padding: '20px', color: '#888' }}>
+                        <p id="end-of-list" style={{ textAlign: 'center', padding: '20px', color: '#888' }}>
                             Đã hiển thị hết sản phẩm.
                         </p>
                     )}
@@ -364,16 +378,17 @@ const Cart = () => {
                             <div className={styles.summaryInfo}>
                                 <div className={styles.summaryRow}>
                                     <span>Số lượng đã chọn:</span>
-                                    <strong>{cartItems.filter(item => item.selected).length} sản phẩm</strong>
+                                    <strong id="total-selected-count">{cartItems.filter(item => item.selected).length} sản phẩm</strong>
                                 </div>
                                 <div className={styles.summaryRow}>
                                     <span>Tổng tiền hàng:</span>
-                                    <strong className={styles.totalAmount}>
+                                    <strong id="cart-total-amount" className={styles.totalAmount}>
                                         {total.toLocaleString()}₫
                                     </strong>
                                 </div>
                             </div>
                             <button
+                                id="btn-checkout" // ✅ ID Nút Thanh toán
                                 className={`${styles.checkoutBtn} ${total > 0 ? styles.active : ''}`}
                                 disabled={total === 0}
                                 onClick={handleBuySelected}

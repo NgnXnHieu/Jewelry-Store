@@ -6,6 +6,7 @@ import { getProductById, getRelatedProducts } from "../../../api/productApi";
 import { addToCart } from "../../../api/cartApi";
 import defaultUrl from "../../../api/defaultUrl";
 import { useBuyNow } from "../../../hook/useBuyNow";
+
 function ProductDetail() {
     const { id } = useParams();
     const navigate = useNavigate();
@@ -80,7 +81,7 @@ function ProductDetail() {
 
     if (!product) {
         return (
-            <div className={styles.loadingContainer}>
+            <div id="loading-container" className={styles.loadingContainer}>
                 <div className={styles.loader}></div>
                 <p>Đang tải sản phẩm...</p>
             </div>
@@ -104,7 +105,7 @@ function ProductDetail() {
                 <span className={styles.separator}>/</span>
                 <span onClick={() => navigate(-1)}>Sản phẩm</span>
                 <span className={styles.separator}>/</span>
-                <span className={styles.currentPage}>{product.name}</span>
+                <span id="breadcrumb-product-name" className={styles.currentPage}>{product.name}</span>
             </div>
 
             {/* Main Product Section */}
@@ -114,11 +115,13 @@ function ProductDetail() {
                     <div className={styles.imageGallery}>
                         <div className={styles.mainImageBox}>
                             <img
+                                id="product-main-image"
                                 src={`${defaultUrl}/images/${product.image_url}`}
                                 alt={product.name}
                                 className={styles.mainImage}
                             />
                             <button
+                                id="btn-favorite"
                                 className={`${styles.favoriteButton} ${favorite ? styles.favorited : ""}`}
                                 onClick={toggleFavorite}
                             >
@@ -132,6 +135,7 @@ function ProductDetail() {
                             {productImages.map((img, index) => (
                                 <div
                                     key={index}
+                                    id={`thumbnail-${index}`}
                                     className={`${styles.thumbnail} ${selectedImage === index ? styles.activeThumbnail : ""}`}
                                     onClick={() => setSelectedImage(index)}
                                 >
@@ -145,7 +149,8 @@ function ProductDetail() {
 
                 {/* Right - Product Info */}
                 <div className={styles.right}>
-                    <h1 className={styles.productName}>{product.name}</h1>
+                    {/* ✅ ID QUAN TRỌNG: TÊN SẢN PHẨM */}
+                    <h1 id="product-detail-name" className={styles.productName}>{product.name}</h1>
 
                     <div className={styles.ratingSection}>
                         <div className={styles.stars}>
@@ -159,7 +164,8 @@ function ProductDetail() {
                     </div>
 
                     <div className={styles.priceSection}>
-                        <div className={styles.currentPrice}>{product.price.toLocaleString()}₫</div>
+                        {/* ✅ ID QUAN TRỌNG: GIÁ SẢN PHẨM */}
+                        <div id="product-detail-price" className={styles.currentPrice}>{product.price.toLocaleString()}₫</div>
                         {product.originalPrice && (
                             <>
                                 <div className={styles.originalPrice}>{product.originalPrice.toLocaleString()}₫</div>
@@ -170,29 +176,36 @@ function ProductDetail() {
 
                     <div className={styles.stockInfo}>
                         <FaCheckCircle className={styles.stockIcon} />
-                        <span>Còn lại: <strong>{product.quantity}</strong> sản phẩm</span>
+                        {/* ✅ ID QUAN TRỌNG: SỐ LƯỢNG TỒN KHO */}
+                        <span>Còn lại: <strong id="product-stock-display">{product.quantity}</strong> sản phẩm</span>
                     </div>
 
                     <div className={styles.quantitySection}>
                         <label className={styles.label}>Số lượng:</label>
                         <div className={styles.quantityControls}>
-                            <button onClick={decrease} className={styles.quantityBtn}>−</button>
+                            {/* ✅ ID QUAN TRỌNG: NÚT GIẢM */}
+                            <button id="btn-decrease-quantity" onClick={decrease} className={styles.quantityBtn}>−</button>
+                            {/* ✅ ID QUAN TRỌNG: Ô INPUT SỐ LƯỢNG */}
                             <input
+                                id="input-quantity"
                                 type="number"
                                 value={quantity}
                                 readOnly
                                 className={styles.quantityInput}
                             />
-                            <button onClick={increase} className={styles.quantityBtn}>+</button>
+                            {/* ✅ ID QUAN TRỌNG: NÚT TĂNG */}
+                            <button id="btn-increase-quantity" onClick={increase} className={styles.quantityBtn}>+</button>
                         </div>
                     </div>
 
                     <div className={styles.actionButtons}>
-                        <button className={styles.addToCartBtn} onClick={() => handleAddToCart(product)}>
+                        {/* ✅ ID QUAN TRỌNG: NÚT THÊM VÀO GIỎ */}
+                        <button id="btn-add-to-cart" className={styles.addToCartBtn} onClick={() => handleAddToCart(product)}>
                             <FaShoppingCart />
                             Thêm vào giỏ
                         </button>
-                        <button className={styles.buyNowBtn} onClick={handleBuyNow}>
+                        {/* ✅ ID QUAN TRỌNG: NÚT MUA NGAY */}
+                        <button id="btn-buy-now" className={styles.buyNowBtn} onClick={handleBuyNow}>
                             Mua ngay
                         </button>
                     </div>
@@ -228,18 +241,21 @@ function ProductDetail() {
             <div className={styles.tabsSection}>
                 <div className={styles.tabButtons}>
                     <button
+                        id="tab-description"
                         className={`${styles.tabButton} ${activeTab === "description" ? styles.activeTab : ""}`}
                         onClick={() => setActiveTab("description")}
                     >
                         Mô tả sản phẩm
                     </button>
                     <button
+                        id="tab-specs"
                         className={`${styles.tabButton} ${activeTab === "specs" ? styles.activeTab : ""}`}
                         onClick={() => setActiveTab("specs")}
                     >
                         Thông số kỹ thuật
                     </button>
                     <button
+                        id="tab-reviews"
                         className={`${styles.tabButton} ${activeTab === "reviews" ? styles.activeTab : ""}`}
                         onClick={() => setActiveTab("reviews")}
                     >
@@ -247,7 +263,7 @@ function ProductDetail() {
                     </button>
                 </div>
 
-                <div className={styles.tabContent}>
+                <div id="tab-content" className={styles.tabContent}>
                     {activeTab === "description" && (
                         <div className={styles.descriptionContent}>
                             <h3>Thông tin sản phẩm</h3>
@@ -339,6 +355,7 @@ function ProductDetail() {
                                         {p.price.toLocaleString()}₫
                                     </div>
                                     <button
+                                        id={`btn-view-related-${p.id}`}
                                         className={styles.relatedButton}
                                         onClick={() => navigate(`/productdetail/${p.id}`)}
                                     >
@@ -353,7 +370,8 @@ function ProductDetail() {
 
             {/* Success Notification */}
             {showNotification && (
-                <div className={styles.notification}>
+                // ✅ ID QUAN TRỌNG: THÔNG BÁO THÀNH CÔNG (Để verify test case)
+                <div id="notification-success" className={styles.notification}>
                     <FaCheckCircle className={styles.notificationIcon} />
                     <span>Đã thêm vào giỏ hàng!</span>
                 </div>

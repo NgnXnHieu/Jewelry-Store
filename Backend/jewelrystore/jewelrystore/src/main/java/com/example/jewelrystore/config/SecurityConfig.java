@@ -44,8 +44,8 @@ public class SecurityConfig {
                         .permitAll() // không cần xác thực
                         .requestMatchers("/api/logout")
                         .hasAnyRole("USER", "STAFF", "MANAGER", "SHIPPER", "ADMIN")
-                        .requestMatchers("/api/forAdmin")
-                        .hasRole("ADMIN")
+                        .requestMatchers("/api/forAdmin","/api/admin/**")
+                        .hasAnyRole("ADMIN","MANAGER","STAFF")
                         .requestMatchers("/api/forUser")
                         .hasAnyRole("USER", "ADMIN")
                         .requestMatchers("/api/users")

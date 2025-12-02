@@ -23,6 +23,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.http.HttpHeaders;
 
+
 @Service
 public class AuthImpl implements AuthService {
     @Autowired
@@ -108,19 +109,19 @@ public class AuthImpl implements AuthService {
 
             ResponseCookie accessCookie = ResponseCookie.from("accessToken", newAccessToken)
                     .httpOnly(true)
-                    .secure(true)
+                    .secure(false)
                     .path("/")
                     .maxAge(60) // 15 phút
-                    .sameSite("None")
+                    .sameSite("Lax")
                     .build();
 
             // Ghi đè lại refresh token cũ bằng cookie mới
             ResponseCookie refreshCookie = ResponseCookie.from("refreshToken", newRefreshToken)
                     .httpOnly(true)
-                    .secure(true)
+                    .secure(false)
                     .path("/")
                     .maxAge(60 * 60 * 24 * 7) // 7 ngày
-                    .sameSite("None")
+                    .sameSite("Lax")
                     .build();
 
             // Trả role trong body
@@ -141,6 +142,8 @@ public class AuthImpl implements AuthService {
 
     @Override
     public ResponseEntity<Map<String, String>> login(LoginForm request, HttpServletResponse response) {
+// Thêm dòng này để debug
+        System.out.println("DEBUG LOGIN: Đang thử đăng nhập với user: " + request.getUsername());
         // 1. Xác thực (Giữ nguyên)
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword()));
@@ -157,18 +160,18 @@ public class AuthImpl implements AuthService {
 
         ResponseCookie accessCookie = ResponseCookie.from("accessToken", accessToken)
                 .httpOnly(true)
-                .secure(true) // Bắt buộc true để chạy với Ngrok
+                .secure(false) // Bắt buộc true để chạy với Ngrok
                 .path("/")
                 .maxAge(60) // 15 phút
-                .sameSite("None") // QUAN TRỌNG: Dòng này giúp vượt qua chặn Cross-site
+                .sameSite("Lax") // QUAN TRỌNG: Dòng này giúp vượt qua chặn Cross-site
                 .build();
 
         ResponseCookie refreshCookie = ResponseCookie.from("refreshToken", refreshToken)
                 .httpOnly(true)
-                .secure(true) // Bắt buộc true
+                .secure(false) // Bắt buộc true
                 .path("/")
                 .maxAge(7 * 24 * 60 * 60) // 7 ngày
-                .sameSite("None") // QUAN TRỌNG
+                .sameSite("Lax") // QUAN TRỌNG
                 .build();
 
         // 4. Trả về Response (Sửa đoạn này)
