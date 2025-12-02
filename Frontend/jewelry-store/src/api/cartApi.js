@@ -1,6 +1,7 @@
 // src/api/cartApi.js
 import axios from "axios";
 
+// const BASE_URL = "https://unleaded-patrica-pruritic.ngrok-free.dev/api/cart_details";
 const BASE_URL = "http://localhost:8080/api/cart_details";
 
 export const addToCart = async (productId, quantity = 1) => {

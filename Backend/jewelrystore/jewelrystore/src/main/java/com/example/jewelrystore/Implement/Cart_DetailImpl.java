@@ -1,7 +1,10 @@
 package com.example.jewelrystore.Implement;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -95,12 +98,15 @@ public class Cart_DetailImpl implements Cart_DetailService {
     }
 
     @Override
-    public Page<Cart_DetailDTO> getCart_DetailsByUserName(String userName, Pageable pageable) {
+    public List<Cart_DetailDTO> getCart_DetailsByUserName(String userName, Integer cursor, int limit) {
         User user = userRepository.findByUsername(userName)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
-        Cart cart = cartRepository.findByUserId(user.getId()).orElse(null);
+        Cart cart = cartRepository.findByUserId(user.getId())
+                .orElseThrow(() -> new EntityNotFoundException("Cart Not Found"));
         Integer cartId = cart.getId();
-        return cart_DetailRepository.findByCartId(cartId, pageable).map(cart_DetailMapper::toCart_DetailDTO);
+        Pageable pageable = PageRequest.of(0, limit);
+        return cart_DetailRepository.getByCartIdByCursor(cartId, cursor, pageable).stream()
+                .map(cart_DetailMapper::toCart_DetailDTO).toList();
     }
 
 }

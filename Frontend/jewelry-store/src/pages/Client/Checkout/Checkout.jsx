@@ -1,33 +1,30 @@
 import React, { useState, useEffect } from "react";
 import axiosInstance from "../../../api/axiosInstance";
 import Swal from "sweetalert2";
-import { useLocation } from "react-router-dom";
+import { useLocation, useParams } from "react-router-dom";
 import styles from "./Checkout.module.css";
 import { useNavigate } from "react-router-dom";
 
 const Checkout = () => {
-    const location = useLocation();
-    const { items } = location.state || { items: [] };
+    // const location = useLocation();
+    // const { items } = location.state || { items: [] };
 
-    console.log("Danh sách sản phẩm mua:", items);
+    // console.log("Danh sách sản phẩm mua:", items);
     const [addresses, setAddresses] = useState([]);
     const [selectedAddress, setSelectedAddress] = useState(null);
     const [orderItems, setOrderItems] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const navigate = useNavigate()
+    const { checkoutId } = useParams();
 
     // ✅ Lấy thông tin địa chỉ
     useEffect(() => {
         const fetchAddresses = async () => {
             try {
-                const [defaultRes, allRes] = await Promise.all([
-                    axiosInstance.get("/addresses/defaultAddress"),
-                    axiosInstance.get("/addresses/myAddress"),
-                ]);
-
-                setSelectedAddress(defaultRes.data);
+                const allRes = await axiosInstance.get("/addresses/myAddress");
                 setAddresses(allRes.data);
+                console.log("Địa chỉ nhận hàng:", allRes.data);
             } catch (err) {
                 console.error("Lỗi khi lấy địa chỉ:", err);
                 setError(err);
@@ -39,22 +36,25 @@ const Checkout = () => {
     // ✅ Lấy chi tiết sản phẩm theo id được truyền sang
     useEffect(() => {
         const fetchProducts = async () => {
-            if (!items.length) return;
+            // if (!items.length) return;
 
             try {
-                const responses = await Promise.all(
-                    items.map((it) => {
-                        const productId = it.productId || it.id;
-                        return axiosInstance.get(`/products/${productId}`);
+                axiosInstance.get(`/checkout/${checkoutId}`)
+                    .then((res) => {
+                        setOrderItems(res.data.checkout_Items);
+                        console.log(res.data);
+                        if (res.data.address !== null) {
+                            setSelectedAddress(res.data.address);
+                        } else {
+                            axiosInstance.get("/addresses/defaultAddress")
+                                .then((res) => {
+                                    setSelectedAddress(res.data);
+                                    console.log("Địa chỉ mặc định:", selectedAddress);
+                                });
+
+                        }
                     })
-                );
-
-                const detailedItems = responses.map((res, idx) => ({
-                    ...res.data,
-                    quantity: items[idx].quantity,
-                }));
-
-                setOrderItems(detailedItems);
+                // setOrderItems(detailedItems);
             } catch (err) {
                 console.error("Lỗi khi tải sản phẩm:", err);
                 setError(err);
@@ -64,11 +64,16 @@ const Checkout = () => {
         };
 
         fetchProducts();
-    }, [items]);
+    }, []);
 
     // ✅ Tính tổng tiền
     const total = orderItems.reduce(
-        (sum, item) => sum + item.price * item.quantity,
+        (sum, item) => sum + item.totalPrice,
+        0
+    );
+
+    const totalQuantity = orderItems.reduce(
+        (sum, item) => sum + item.quantity,
         0
     );
 
@@ -162,18 +167,19 @@ const Checkout = () => {
         }
 
         const paymentMethod = document.querySelector('input[name="paymentMethod"]:checked').value;
-
+        const orderData = {
+            // address: `${selectedAddress.village}, ${selectedAddress.ward}, ${selectedAddress.district}`,
+            // phone: selectedAddress.phone,
+            // idAndQuantityList: orderItems.map((item) => ({
+            //     productId: item.id,
+            //     quantity: item.quantity,
+            // })),
+            addressId: selectedAddress.id,
+            checkoutId: checkoutId,
+        };
         if (paymentMethod === "cod") {
-            const orderData = {
-                address: `${selectedAddress.village}, ${selectedAddress.ward}, ${selectedAddress.district}`,
-                phone: selectedAddress.phone,
-                idAndQuantityList: orderItems.map((item) => ({
-                    productId: item.id,
-                    quantity: item.quantity,
-                })),
-            };
-
             try {
+                orderData["payment_method"] = "COD";
                 const result = await Swal.fire({
                     title: "Xác nhận đặt hàng?",
                     text: `Giao tới ${selectedAddress.village}, ${selectedAddress.ward}, ${selectedAddress.district}`,
@@ -184,7 +190,7 @@ const Checkout = () => {
                 });
 
                 if (result.isConfirmed) {
-                    const res = await axiosInstance.post("/orders/myOrder", orderData);
+                    const res = await axiosInstance.post("/checkout/placeOrder", orderData);
 
                     Swal.fire(
                         "Thành công!",
@@ -198,6 +204,21 @@ const Checkout = () => {
                 Swal.fire("Thất bại!", "Không thể tạo đơn hàng. Vui lòng thử lại!", "error");
             }
 
+            return;
+        } else if (paymentMethod === "bank") {
+            orderData["payment_method"] = "BANK";
+            const res = await axiosInstance.post("/checkout/placeOrder", orderData);
+            console.log(res.data);
+            // navigate('/qrTransfer', {
+            //     state: {
+            //         qr: res.data,
+            //         orderItems: orderItems,
+            //         total: total,
+            //         address: `${selectedAddress.village}, ${selectedAddress.ward}, ${selectedAddress.district}`,
+            //         phone: selectedAddress.phone
+            //     }
+            // });
+            navigate(`/qrTransfer/${checkoutId}`);
             return;
         }
 
@@ -241,7 +262,7 @@ const Checkout = () => {
                     <div className={styles.heroIcon}>🛍️</div>
                     <h1 className={styles.heroTitle}>Thanh toán đơn hàng</h1>
                     <p className={styles.heroSubtitle}>
-                        Hoàn tất đơn hàng của bạn với {orderItems.length} sản phẩm
+                        Hoàn tất đơn hàng của bạn với {totalQuantity} sản phẩm
                     </p>
                 </div>
             </div>
@@ -374,7 +395,7 @@ const Checkout = () => {
                     <div className={styles.sectionCard}>
                         <div className={styles.sectionHeader}>
                             <h2>🛒 Đơn hàng của bạn</h2>
-                            <span className={styles.itemCount}>{orderItems.length} sản phẩm</span>
+                            <span className={styles.itemCount}>{totalQuantity} sản phẩm</span>
                         </div>
 
                         <div className={styles.orderList}>
@@ -391,10 +412,13 @@ const Checkout = () => {
                                     <div className={styles.itemDetails}>
                                         <p className={styles.itemName}>{item.name}</p>
                                         <p className={styles.itemPrice}>
-                                            {item.quantity} x {item.price.toLocaleString()}₫
+                                            x{item.quantity}
                                         </p>
-                                        <p className={styles.itemTotal}>
-                                            {(item.price * item.quantity).toLocaleString()}₫
+                                        <p className={styles.itemPrice}>
+                                            Đơn giá: {(item.totalPrice / item.quantity).toLocaleString()}₫
+                                        </p>
+                                        <p className={styles.itemPrice}>
+                                            Tổng: {item.totalPrice.toLocaleString()}₫
                                         </p>
                                     </div>
                                 </div>

@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import styles from "./OrderManagement.module.css";
 import axiosInstance from "../../../api/axiosInstance";
 import Swal from "sweetalert2";
-
+import defaultUrl from "../../../api/defaultUrl";
 
 const STATUS_LEVELS = {
     "Hủy đơn hàng": -1,
@@ -105,7 +105,7 @@ function ProductInfo({ productId }) {
 
     return (
         <div className={styles.imagAndName}>
-            <img src={`http://localhost:8080/images/${product.image_url}`} alt={product.image_url} className={styles.productImage} />
+            <img src={`${defaultUrl}/images/${product.image_url}`} alt={product.image_url} className={styles.productImage} />
             {/* <div>{product.name}</div> */}
             <div className={styles.productName}>{product.name}</div>
         </div>
@@ -205,15 +205,6 @@ function OrderDetailsDialog({ orderId, open, onOpenChange }) {
                                                 <div className={styles.rowContent}>
                                                     {/* <div className={styles.orderIdCell}>{item.orderId}</div> */}
                                                     <div className={styles.productCell}>
-                                                        {/* {product && (
-                                                            <>
-                                                                <img src={`http://localhost:8080/images/${product.image_url}`} alt={product.image_url} className={styles.productImage} />
-                                                                <span>{product.name}</span>
-                                                            </>
-                                                        )}
-                                                        {!product && <span>Không tìm thấy</span>}{
-                                                            console.log("Product2:", product)
-                                                        } */}
                                                         <ProductInfo productId={item.productId} />
                                                     </div>
                                                     <div className={styles.productIdCell}>{item.id}</div>

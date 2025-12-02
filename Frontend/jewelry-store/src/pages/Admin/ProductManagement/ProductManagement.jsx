@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import style from "./ProductManagement.module.css";
 import axiosInstance from "../../../api/axiosInstance";
 import Swal from "sweetalert2";
-
+import defaultUrl from "../../../api/defaultUrl";
 
 function ProductManagement() {
     const [products, setProducts] = useState([]);
@@ -182,7 +182,7 @@ function ProductManagement() {
             image_url: product.image_url || "",
             image: null
         });
-        setImagePreview(product.image_url ? `http://localhost:8080/images/${product.image_url}` : "");
+        setImagePreview(product.image_url ? `${defaultUrl}/images/${product.image_url}` : "");
 
         // axiosInstance.get('/categories/all')
         //     .then(res => setCategories(res.data))
@@ -291,10 +291,10 @@ function ProductManagement() {
                                         <div className={style.imageCell}>
                                             {p.image_url ? (
                                                 <img
-                                                    src={`http://localhost:8080/images/${p.image_url}`}
+                                                    src={`${defaultUrl}/images/${p.image_url}`}
                                                     alt={p.name}
                                                     className={style.productImage}
-                                                    onClick={() => setFullSizeImage({ url: `http://localhost:8080/images/${p.image_url}`, name: p.name })}
+                                                    onClick={() => setFullSizeImage({ url: `${defaultUrl}/images/${p.image_url}`, name: p.name })}
                                                     style={{ cursor: 'pointer' }}
                                                 />
                                             ) : (

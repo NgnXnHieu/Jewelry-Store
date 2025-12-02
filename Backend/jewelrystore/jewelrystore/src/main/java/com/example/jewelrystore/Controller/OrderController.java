@@ -69,10 +69,14 @@ public class OrderController {
     }
 
     @GetMapping("/myOrders")
-    public List<OrderDTO> getodersByUsername(@AuthenticationPrincipal UserDetails userDetails) {
-        if (userDetails == null)
+    public List<OrderDTO> getodersByUsername(@AuthenticationPrincipal UserDetails userDetails,
+            @RequestParam(required = false) Integer cursor,
+            @RequestParam(defaultValue = "10") int limit) {
+        if (userDetails == null) {
+            System.out.println("KHONG CO QUYEN");
             return null;
-        return service.getOrdersByUsername(userDetails.getUsername());
+        }
+        return service.getOrdersByUsername(userDetails.getUsername(), cursor, limit);
     }
 
     @PostMapping("/myOrder")
@@ -86,10 +90,12 @@ public class OrderController {
 
     @GetMapping("/myOrdersByStatus")
     public List<OrderDTO> getMyOrderByStatus(@AuthenticationPrincipal UserDetails userDetails,
-            @RequestParam String status) {
+            @RequestParam String status,
+            @RequestParam(required = false) Integer cursor,
+            @RequestParam(defaultValue = "10") int limit) {
         if (userDetails == null)
             return null;
-        return service.getMyOrderByStatus(userDetails.getUsername(), status);
+        return service.getMyOrderByStatus(userDetails.getUsername(), status, cursor, limit);
     }
 
     // Lấy số lượng đơn hàng theo time unit (day, month, year)

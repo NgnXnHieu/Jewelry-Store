@@ -44,8 +44,8 @@ public class SecurityConfig {
                         .permitAll() // không cần xác thực
                         .requestMatchers("/api/logout")
                         .hasAnyRole("USER", "STAFF", "MANAGER", "SHIPPER", "ADMIN")
-                        .requestMatchers("/api/forAdmin")
-                        .hasRole("ADMIN")
+                        .requestMatchers("/api/forAdmin","/api/admin/**")
+                        .hasAnyRole("ADMIN","MANAGER","STAFF")
                         .requestMatchers("/api/forUser")
                         .hasAnyRole("USER", "ADMIN")
                         .requestMatchers("/api/users")
@@ -54,7 +54,8 @@ public class SecurityConfig {
                         // .requestMatchers("/api/products", "/api/products/{id}",
                         // "/api/products/getRelatedProducts/{id}")
                         // .permitAll()
-                        .requestMatchers("/api/users/infor", "/api/cart_details/cart_detailsByUserName")
+                        .requestMatchers("/api/users/infor", "/api/cart_details/cart_detailsByUserName",
+                                "/api/orders/**")
                         .authenticated()
                         // .hasAnyRole("USER", "ADMIN")
                         // .anyRequest().authenticated() // các request khác cần xác thực

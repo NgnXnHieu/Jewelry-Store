@@ -3,20 +3,29 @@ import { useNavigate } from "react-router-dom";
 import style from "./BestSeller.module.css";
 import axios from "axios";
 import { FaCheckCircle } from "react-icons/fa";
-
+import PageNumber from "../../../components/Header/PageNumber/PageNumber";
+import defaultUrl from "../../../api/defaultUrl";
+import axiosInstance from "../../../api/axiosInstance";
+import { useBuyNow } from "../../../hook/useBuyNow";
 function BestSeller() {
     const [bestSellers, setBestSellers] = useState([]);
     const [wishlist, setWishlist] = useState([]);
     const [showNotification, setShowNotification] = useState(false);
+    const [currentPage, setCurrentPage] = useState(0);
+    const [totalPages, setTotalPages] = useState(1);
     const navigate = useNavigate();
 
     useEffect(() => {
-        axios.get("http://localhost:8080/api/products/bestSeller")
+        window.scrollTo(0, 0);
+        axios.get(`products/bestSeller?page=${currentPage}&size=20`)
             .then(res => {
                 setBestSellers(res.data.content || res.data);
+                console.log(res.data);
+                setCurrentPage(res.data.number);
+                setTotalPages(res.data.totalPages);
             })
             .catch(err => console.error("Lỗi khi tải dữ liệu:", err));
-    }, []);
+    }, [currentPage]);
 
     const handleCardClick = (id) => {
         navigate(`/productdetail/${id}`);
@@ -87,9 +96,9 @@ function BestSeller() {
                             onClick={() => handleCardClick(product.id)}
                         >
                             <div className={style.cardImageWrapper}>
-                                {product.image_url ? (
+                                {product.imageUrl ? (
                                     <img
-                                        src={product.image_url}
+                                        src={`${defaultUrl}/images/${product.imageUrl}`}
                                         alt={product.name}
                                         className={style.image}
                                     />
@@ -153,7 +162,11 @@ function BestSeller() {
                     </div>
                 )}
             </section>
-
+            <PageNumber
+                currentPage={currentPage}
+                totalPages={totalPages}
+                setCurrentPage={setCurrentPage} // Truyền hàm set state xuống
+            />
             {/* Features Section */}
             <section className={style.featuresSection}>
                 <div className={style.featuresGrid}>
@@ -187,6 +200,8 @@ function BestSeller() {
                     <span>Đã thêm vào giỏ hàng!</span>
                 </div>
             )}
+
+
         </div>
     );
 }

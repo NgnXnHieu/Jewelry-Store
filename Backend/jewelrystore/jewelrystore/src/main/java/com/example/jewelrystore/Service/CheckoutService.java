@@ -13,4 +13,6 @@ public interface CheckoutService {
     CheckoutDTO getCheckout(Integer id, String username);
 
     void processPaymentSuccess(SePayWebhookDTO payload);
+
+    Boolean checkStatus(Integer checkoutId, String username);
 }

@@ -130,7 +130,7 @@ public class ProductImpl implements ProductService {
             Product product = productMapper.toEntity(Form);
             product.setImage_url(imagePath);
             User user = userRepository.findByUsername(username)
-                    .orElseThrow(() -> new RuntimeException("Product not found"));
+                    .orElseThrow(() -> new RuntimeException("User not found"));
             Inventory_History inventory_History = new Inventory_History();
             inventory_History.setUser(user);
             Long quantity = Form.getQuantity();

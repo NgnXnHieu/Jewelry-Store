@@ -16,64 +16,44 @@ export default function Login() {
         confirmPassword: ""
     });
 
-    // Khi người dùng nhập dữ liệu
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
     };
 
-    // 🔸 Xử lý đăng nhập
     const handleLogin = async (e) => {
         e.preventDefault();
-
         try {
-            // Gửi login request với axios, cookies sẽ tự set bởi backend
-            const res = await axiosInstance.post(
-                "/login",
-                {
-                    username: formData.username,
-                    password: formData.password
-                },
-                {
-                    withCredentials: true // 🔑 bắt buộc nếu backend set HttpOnly cookies
-                }
-            );
+            const res = await axiosInstance.post("/login", {
+                username: formData.username,
+                password: formData.password
+            }, { withCredentials: true });
 
-            // Không cần lưu token ở frontend nữa
             alert("Login successful!");
-
-            // Nếu backend trả role trong response, dùng để chuyển hướng
             if (res.data.role === "ROLE_ADMIN") {
                 navigate("/admin");
             } else {
-                navigate("/"); // tạm thời chuyển về admin trang chính
+                navigate("/");
             }
-
         } catch (err) {
             console.error(err);
             alert("Login failed. Please check your credentials.");
         }
     };
 
-    // 🔸 Xử lý đăng ký
     const handleRegister = async (e) => {
         e.preventDefault();
         if (formData.password !== formData.confirmPassword) {
             alert("Passwords do not match!");
             return;
         }
-
         try {
-            await axiosInstance.post(
-                "/register",
-                {
-                    username: formData.username,
-                    fullname: formData.fullname,
-                    email: formData.email,
-                    password: formData.password,
-                    phone: formData.phone,
-                },
-                { withCredentials: true } // nếu backend trả cookie ngay sau register
-            );
+            await axiosInstance.post("/register", {
+                username: formData.username,
+                fullname: formData.fullname,
+                email: formData.email,
+                password: formData.password,
+                phone: formData.phone,
+            }, { withCredentials: true });
 
             alert("Registration successful! Please sign in.");
             setTab("signin");
@@ -92,12 +72,14 @@ export default function Login() {
                     {/* Tabs */}
                     <div className={styles.tab}>
                         <button
+                            id="tab-signin" // ✅ ID Tab Đăng nhập
                             className={`${styles.tabBtn} ${tab === "signin" ? styles.active : ""}`}
                             onClick={() => setTab("signin")}
                         >
                             Sign in
                         </button>
                         <button
+                            id="tab-signup" // ✅ ID Tab Đăng ký
                             className={`${styles.tabBtn} ${tab === "signup" ? styles.active : ""}`}
                             onClick={() => setTab("signup")}
                         >
@@ -105,11 +87,12 @@ export default function Login() {
                         </button>
                     </div>
 
-                    {/* Form */}
+                    {/* Form Login */}
                     {tab === "signin" ? (
-                        <form className={styles.form} onSubmit={handleLogin}>
+                        <form id="form-login" className={styles.form} onSubmit={handleLogin}>
                             <label>Username</label>
                             <input
+                                id="login-username" // ✅ ID Input User
                                 type="text"
                                 name="username"
                                 placeholder="Enter your username"
@@ -119,6 +102,7 @@ export default function Login() {
 
                             <label>Password</label>
                             <input
+                                id="login-password" // ✅ ID Input Pass
                                 type="password"
                                 name="password"
                                 placeholder="Enter your password"
@@ -126,7 +110,7 @@ export default function Login() {
                                 required
                             />
 
-                            <button type="submit" className={styles.btnSignIn}>
+                            <button id="btn-login" type="submit" className={styles.btnSignIn}>
                                 Sign in
                             </button>
 
@@ -135,9 +119,11 @@ export default function Login() {
                             </p>
                         </form>
                     ) : (
-                        <form className={styles.form} onSubmit={handleRegister}>
+                        // Form Register
+                        <form id="form-register" className={styles.form} onSubmit={handleRegister}>
                             <label>Full Name</label>
                             <input
+                                id="reg-fullname"
                                 type="text"
                                 name="fullname"
                                 placeholder="Full Name"
@@ -146,6 +132,7 @@ export default function Login() {
                             />
                             <label>Phone Number</label>
                             <input
+                                id="reg-phone"
                                 type="text"
                                 name="phone"
                                 placeholder="Phone Number"
@@ -154,6 +141,7 @@ export default function Login() {
                             />
                             <label>User Name</label>
                             <input
+                                id="reg-username"
                                 type="text"
                                 name="username"
                                 placeholder="User Name"
@@ -162,6 +150,7 @@ export default function Login() {
                             />
                             <label>Password</label>
                             <input
+                                id="reg-password"
                                 type="password"
                                 name="password"
                                 placeholder="Password"
@@ -170,6 +159,7 @@ export default function Login() {
                             />
                             <label>Confirm Password</label>
                             <input
+                                id="reg-confirm-password"
                                 type="password"
                                 name="confirmPassword"
                                 placeholder="Confirm Password"
@@ -178,6 +168,7 @@ export default function Login() {
                             />
                             <label>Email</label>
                             <input
+                                id="reg-email"
                                 type="text"
                                 name="email"
                                 placeholder="Email"
@@ -185,7 +176,7 @@ export default function Login() {
                                 required
                             />
 
-                            <button type="submit" className={styles.btnSignIn}>
+                            <button id="btn-register" type="submit" className={styles.btnSignIn}>
                                 Create
                             </button>
                         </form>

@@ -59,7 +59,7 @@ function Header() {
     // Fetch categories
     useEffect(() => {
         axiosInstance
-            .get("http://localhost:8080/api/categories")
+            .get("/categories")
             .then((res) => {
                 setCategories(res.data.content || res.data);
             })
@@ -72,6 +72,11 @@ function Header() {
         navigate(`/category/${categoryId}`);
         setShowMobileMenu(false);
     };
+
+    const goToHome = () => {
+        navigate(`/home`)
+        window.scroll(0, 0)
+    }
 
     const handleSearch = (e) => {
         e.preventDefault();
@@ -88,7 +93,7 @@ function Header() {
                 <Link to="/" className={style.logoLink}>
                     <div className={style.logo}>
                         <span className={style.logoIcon}>💎</span>
-                        <h1 className={style.logoText}>Jewelry Store</h1>
+                        <h1 className={style.logoText} onClick={goToHome}>Jewelry Store</h1>
                     </div>
                 </Link>
 

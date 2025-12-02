@@ -1,6 +1,7 @@
 import axios from "axios";
 
 const axiosInstance = axios.create({
+    // baseURL: "https://unleaded-patrica-pruritic.ngrok-free.dev/api",
     baseURL: "http://localhost:8080/api",
     withCredentials: true
 });
@@ -10,12 +11,14 @@ axiosInstance.interceptors.response.use(
     async (error) => {
         const originalRequest = error.config;
         if (error.response?.status === 401 && !originalRequest._retry) {
+            console.log("🔥 Phát hiện lỗi 401, đang thử Refresh...", originalRequest.url);
             originalRequest._retry = true;
 
 
             // Gọi refresh token
             try {
                 await axios.post(
+                    // "https://unleaded-patrica-pruritic.ngrok-free.dev/api/refreshToken",
                     "http://localhost:8080/api/refreshToken",
                     {},
                     { withCredentials: true }

@@ -82,8 +82,10 @@ public class OrderImpl implements OrderService {
     }
 
     @Override
-    public List<OrderDTO> getOrdersByUsername(String username) {
-        List<Order> orders = orderRepository.findByUserUsername(username);
+    public List<OrderDTO> getOrdersByUsername(String username, Integer cursor, int limit) {
+        Pageable pageable = PageRequest.of(0, limit);
+        User user = userRepository.findByUsername(username).orElseThrow(() -> new RuntimeException("User Not Found"));
+        List<Order> orders = orderRepository.findMyOrdersCursor(user.getId(), cursor, pageable);
         return orders.stream().map(orderMapper::toOrderDTO).toList();
     }
 
@@ -128,8 +130,11 @@ public class OrderImpl implements OrderService {
     }
 
     @Override
-    public List<OrderDTO> getMyOrderByStatus(String username, String status) {
-        List<Order> orders = orderRepository.findByUserUsernameAndStatus(username, status);
+    public List<OrderDTO> getMyOrderByStatus(String username, String status, Integer cursor, int limit) {
+        Pageable pageable = PageRequest.of(0, limit);
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new EntityNotFoundException("User Not Found"));
+        List<Order> orders = orderRepository.findMyOrdersByStatusCursor(user.getId(), status, cursor, pageable);
         return orders.stream().map(orderMapper::toOrderDTO).toList();
     }
 

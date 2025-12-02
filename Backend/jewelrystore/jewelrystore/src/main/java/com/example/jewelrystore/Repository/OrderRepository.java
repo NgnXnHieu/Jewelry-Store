@@ -61,5 +61,24 @@ public interface OrderRepository extends JpaRepository<Order, Integer> {
                         @Param("endDate") LocalDateTime endDate,
                         @Param("status") String status);
 
-        // Lấy ra tổng doanh thu của năm
+        // lấy TẤT CẢ đơn hàng (theo cursor)
+        @Query("SELECT o FROM Order o WHERE o.user.id = :userId " +
+                        "AND (:cursor IS NULL OR o.id < :cursor) " + // Logic Cursor ở đây
+                        "ORDER BY o.id DESC")
+        List<Order> findMyOrdersCursor(
+                        @Param("userId") Integer userId,
+                        @Param("cursor") Integer cursor,
+                        Pageable pageable // Dùng cái này để set Limit
+        );
+
+        // lấy theo TRẠNG THÁI (theo cursor)
+        @Query("SELECT o FROM Order o WHERE o.user.id = :userId " +
+                        "AND o.status = :status " +
+                        "AND (:cursor IS NULL OR o.id < :cursor) " +
+                        "ORDER BY o.id DESC")
+        List<Order> findMyOrdersByStatusCursor(
+                        @Param("userId") Integer userId,
+                        @Param("status") String status,
+                        @Param("cursor") Integer cursor,
+                        Pageable pageable);
 }

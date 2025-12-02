@@ -4,17 +4,16 @@ import style from "./Home.module.css";
 import { getAllProducts } from "../../../api/productApi";
 import { addToCart } from "../../../api/cartApi";
 import { FaCheckCircle } from "react-icons/fa";
-
-
+import axios from "../../../api/axiosInstance";
+import defaultUrl from "../../../api/defaultUrl";
 function Home() {
-    const products = [
-        { id: 1, name: "Vòng tay bạc", price: 250000, image: "https://tse4.mm.bing.net/th/id/OIP.zoycwLWxDNMCqiynRvp_hAHaEO?cb=12&rs=1&pid=ImgDetMain&o=7&rm=3" },
-        { id: 2, name: "Nhẫn kim cương", price: 1200000, image: "https://tse3.mm.bing.net/th/id/OIP.pxMHQIF04UVpDJAn8UufXwHaE8?cb=12&w=1024&h=683&rs=1&pid=ImgDetMain&o=7&rm=3" },
-        { id: 3, name: "Dây chuyền vàng", price: 950000, image: "https://tse2.mm.bing.net/th/id/OIP.axmcZGzGUEemYiHG9r99_gHaFA?cb=12&rs=1&pid=ImgDetMain&o=7&rm=3" },
-        { id: 4, name: "Bông tai ngọc trai", price: 550000, image: "https://wallpapers.com/images/hd/jewelry-pictures-wyd23ar9xagseo7d.jpg" },
-        { id: 5, name: "Bông tai ngọc trai", price: 550000, image: "https://wallpapers.com/images/hd/jewelry-pictures-wyd23ar9xagseo7d.jpg" },
-        { id: 6, name: "Bông tai ngọc trai", price: 550000, image: "https://wallpapers.com/images/hd/jewelry-pictures-wyd23ar9xagseo7d.jpg" }
-    ];
+    useEffect(() => {
+        axios.get("products/bestSeller?page=0&size=10")
+            .then(res => {
+                setBestSellers(res.data.content || res.data);
+            })
+            .catch(err => console.error("Lỗi khi tải dữ liệu:", err));
+    }, []);
 
     const categories = [
         { id: 1, name: "Nhẫn", icon: "💍", count: 125, color: "#FFD700" },
@@ -25,6 +24,7 @@ function Home() {
         { id: 6, name: "Phụ kiện", icon: "👑", count: 67, color: "#FFDAB9" }
     ];
 
+    const [bestSeller, setBestSellers] = useState([]);
     const [listProducts, setProducts] = useState([]);
     const [activeFilter, setActiveFilter] = useState("all");
     const [wishlist, setWishlist] = useState([]);
@@ -46,16 +46,6 @@ function Home() {
         navigate(`/bestSeller`);
     };
 
-    // const handleAddToCart = (product, e) => {
-    //     e.stopPropagation();
-    //     console.log("Thêm vào giỏ:", product);
-    //     // Show toast notification
-    //     const toast = document.createElement('div');
-    //     toast.className = style.toast;
-    //     toast.textContent = '✓ Đã thêm vào giỏ hàng';
-    //     document.body.appendChild(toast);
-    //     setTimeout(() => toast.remove(), 3000);
-    // };
 
     const toggleWishlist = (productId, e) => {
         e.stopPropagation();
@@ -71,9 +61,13 @@ function Home() {
         // Navigate to category page or filter products
     };
 
+    const handleGoToAllProduct = () => {
+        navigate("/allProducts")
+    }
+
     //Xử lý thêm giỏ hàng
     const handleAddToCart = async (product, e) => {
-        e.stopPropagation();
+        // e.stopPropagation();
         try {
             const res = await addToCart(product.id);
             console.log(`Đã thêm "${product.name}" vào giỏ hàng`, res);
@@ -202,15 +196,15 @@ function Home() {
                 </div>
 
                 <div className={style.grid}>
-                    {products.map(product => (
+                    {bestSeller.map(product => (
                         <div
                             key={product.id}
                             className={style.card}
                             onClick={() => handleCardClick(product.id)}
                         >
                             <div className={style.cardImageWrapper}>
-                                {product.image ? (<img
-                                    src={`http://localhost:8080/images/${product.image_url}`}
+                                {product.imageUrl ? (<img
+                                    src={`${defaultUrl}/images/${product.imageUrl}`}
                                     alt={product.name}
                                     className={style.image}
                                 />) : (
@@ -273,7 +267,7 @@ function Home() {
                             <h2 className={style.sectionTitle}>🏆 Tất cả sản phẩm</h2>
                             <p className={style.sectionSubtitle}>Khám phá bộ sưu tập đa dạng của chúng tôi</p>
                         </div>
-                        <button className={style.viewAllButton}>
+                        <button className={style.viewAllButton} onClick={handleGoToAllProduct}>
                             <span>Xem tất cả</span>
                             <img className={style.arrow_button} src="/image/arrow.png" alt="arrow" />
                         </button>
@@ -293,7 +287,7 @@ function Home() {
                                     /> */}
                                     {/* {console.log(product)} */}
                                     {product.image_url ? (<img
-                                        src={`http://localhost:8080/images/${product.image_url}`}
+                                        src={`${defaultUrl}/images/${product.image_url}`}
                                         alt={product.name}
                                         className={style.image}
                                     />) : (

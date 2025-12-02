@@ -20,6 +20,8 @@ import CategoryManagement from "./pages/Admin/CategoryManagement/CategoryManagem
 import OrderManagement from "./pages/Admin/OrderManagement/OrderManagement.jsx";
 import HumanResourcesManagement from "./pages/Admin/HumanResourcesManagement/HumanResourcesManagement.jsx";
 import Inventory from "./pages/Admin/Inventory/Inventory.jsx";
+import AllProduct from "./pages/AllProducts/AllProduct.jsx";
+import QRTransfer from "./pages/Client/QRTransfer/QRTransfer.jsx";
 function App() {
   return (
     <BrowserRouter>
@@ -31,11 +33,13 @@ function App() {
           <Route path="/productdetail/:id" element={<ProductDetail />} />
           <Route path="/order" element={<Order />} />
           <Route path="/cart" element={<Cart />} />
-          <Route path="/checkout" element={<Checkout />} />
+          <Route path="/checkout/:checkoutId" element={<Checkout />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/addressManager" element={<AddressManager />} />
           <Route path="/bestSeller" element={<BestSeller />} />
           <Route path="/category/:id" element={<Category />} />
+          <Route path="/allProducts" element={<AllProduct />} />
+          <Route path="/qrTransfer/:checkoutId" element={<QRTransfer />} />
         </Route>
 
         {/* Layout không có Header */}
